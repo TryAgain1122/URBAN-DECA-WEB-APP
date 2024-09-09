@@ -42,7 +42,7 @@ const NewPassword = ({ token }: Props) => {
       toast.success("Password reset was successful");
       router.push("/");
     }
-  }, [error, isSuccess]);
+  }, [error, isSuccess, router]);
 
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

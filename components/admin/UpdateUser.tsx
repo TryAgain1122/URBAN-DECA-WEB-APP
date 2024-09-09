@@ -45,7 +45,7 @@ const UpdateUser = ({ data }: Props) => {
         router.refresh();
         toast.success("User Updated")
       }
-  },[isSuccess, error])
+  },[isSuccess, error, router])
 
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

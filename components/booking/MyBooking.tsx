@@ -59,7 +59,7 @@ const MyBookings = ({ data }: Props) => {
       onOpenChange();
       setSelectedBookingId(null);
     }
-  }, [error, isSuccess, selectedBookingId]);
+  }, [error, isSuccess, selectedBookingId, router, onOpenChange]);
 
   const cancelBookingHandler = (id: string) => {
     setSelectedBookingId(id);

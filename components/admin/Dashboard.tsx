@@ -31,7 +31,7 @@ const Dashboard = () => {
         endDate: endDate.toISOString(),
       });
     }
-  }, [error]);
+  }, [data, startDate, endDate, error]);
 
   const submitHandler = () => {
     getSalesStats({

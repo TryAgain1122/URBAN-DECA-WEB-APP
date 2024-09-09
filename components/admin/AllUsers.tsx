@@ -47,7 +47,7 @@ const AllUsers = ({ data }: Props) => {
       router.refresh();
       toast.success("User Deleted");
     }
-  }, [error, isSuccess]);
+  }, [error, isSuccess, router]);
 
   const setUsers = () => {
     const data: { columns: any[]; rows: any[] } = {

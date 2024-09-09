@@ -66,7 +66,7 @@ const NewRoom = () => {
       router.push("/admin/rooms");
       toast.success("Room created");
     }
-  }, [error, isSuccess]);
+  }, [error, isSuccess, router]);
 
   const SubmitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

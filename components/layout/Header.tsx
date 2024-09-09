@@ -42,7 +42,7 @@ export default function Header() {
       dispatch(setUser(data?.user));
       dispatch(setIsAuthenticated(true));
     }
-  }, [status, data]);
+  }, [status, data, dispatch]);
 
   return (
     // <Navbar>

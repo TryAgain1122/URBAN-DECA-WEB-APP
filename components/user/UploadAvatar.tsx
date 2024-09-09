@@ -52,7 +52,7 @@ const UploadAvatar = () => {
             router.refresh();
             toast.success("Image Updated")
         }
-    },[user, error, isSuccess])
+    },[user, error, isSuccess, router])
 
     const submitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

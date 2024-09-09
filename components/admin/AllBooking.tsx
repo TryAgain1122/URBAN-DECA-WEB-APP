@@ -46,7 +46,7 @@ const AllBookings = ({ data }: Props) => {
       router.refresh();
       toast.success("Booking deleted")
     }
-  },[error, isSuccess])
+  },[error, isSuccess, router])
 
   const setBookings = () => {
     const data: { columns: any[]; rows: any[] } = {

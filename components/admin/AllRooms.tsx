@@ -48,7 +48,7 @@ const AllRooms = ({ data }: Props) => {
       router.refresh();
       toast.success("Room Deleted");
     }
-  }, [error, isSuccess]);
+  }, [error, isSuccess, router]);
 
   const setBookings = () => {
     const data: { columns: any[]; rows: any[] } = {

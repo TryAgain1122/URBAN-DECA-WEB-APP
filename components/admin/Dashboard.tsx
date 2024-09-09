@@ -43,7 +43,6 @@ const Dashboard = () => {
       }
     });
   };
-  console.log(data);
 
   if (isLoading) {
     return (

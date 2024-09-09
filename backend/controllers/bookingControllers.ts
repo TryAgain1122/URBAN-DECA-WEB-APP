@@ -288,6 +288,6 @@ export const deleteBooking = catchAsyncErrors(
 
     return NextResponse.json({
       success: true,
-    });
+    }, { status: 200 });
   }
 );

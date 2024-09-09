@@ -2,7 +2,7 @@
 
 import { IBooking } from "@/backend/models/booking";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Table, 
     TableHeader, 
@@ -27,10 +27,10 @@ interface Props {
   };
 }
 
-const AllBookings = ({ data }: Props) => {
+const AllBookings = ({ data }:Props) => {
+  const [bookingIdToDelete, setBookingIdToDelete] = useState<string | null>(null)
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const bookings = data?.bookings;
-
   const router = useRouter()
 
   const [deleteBooking, { error, isLoading, isSuccess}] = useDeleteBookingMutation();
@@ -84,7 +84,8 @@ const AllBookings = ({ data }: Props) => {
                 >
               <i className="fa fa-receipt text-white"></i>
             </Button>
-            <Button isIconOnly  onPress={onOpen} color="danger">
+
+            {/* <Button isIconOnly  onPress={onOpen} color="danger">
               <i className="fa fa-trash"></i>{" "}
             </Button>
             <Modal
@@ -114,7 +115,18 @@ const AllBookings = ({ data }: Props) => {
                   </>
                 )}
               </ModalContent>
-            </Modal>
+            </Modal> */}
+
+            <Button
+              isIconOnly
+              onPress={() => {
+                setBookingIdToDelete(booking._id);
+                onOpen();
+              }}
+              color="danger"
+            >
+              <i className="fa fa-trash"></i>{" "}
+            </Button>
           </div>
         ),
         status: booking.status,
@@ -123,13 +135,16 @@ const AllBookings = ({ data }: Props) => {
     return data;
   };
 
-  const deleteRoomHandler = (id: string) => {
-    deleteBooking(id)
+  const deleteRoomHandler = () => {
+    if (bookingIdToDelete) {
+      deleteBooking(bookingIdToDelete);
+    }
   }
 
   const bookingData = setBookings();
 
   return (
+    <>
     <Table className="px-5 mt-10">
       <TableHeader>
         {bookingData.columns.map((column, index) => (
@@ -149,7 +164,33 @@ const AllBookings = ({ data }: Props) => {
         ))}
       </TableBody>
     </Table>
+
+    <Modal backdrop="opaque" isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+            <ModalBody>
+              <h1 className="mt-5">Are you sure you want to delete?</h1>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={onClose}>No</Button>
+              <Button
+                color="secondary"
+                onPress={() => {
+                  onClose();
+                  deleteRoomHandler();
+                }}
+                isDisabled={isLoading}
+              >Yes</Button>
+            </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+    </Modal>
+    </>
   );
 };
 
 export default AllBookings;
+
+

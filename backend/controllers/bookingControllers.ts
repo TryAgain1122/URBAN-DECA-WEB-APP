@@ -286,6 +286,7 @@ export const deleteBooking = catchAsyncErrors(async (req: NextRequest, {params}:
   await booking?.deleteOne();
   
   return NextResponse.json({
-    success: true
-  })
+    success: true,
+    message: "Booking deleted successfully"
+  }, { status: 200})
 })

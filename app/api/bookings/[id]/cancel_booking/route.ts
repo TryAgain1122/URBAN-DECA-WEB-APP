@@ -14,10 +14,10 @@ router.use(isAuthenticatedUser);
 router.get(getBookingDetails);
 router.put(cancelBooking);
 
-export async function GET(request: NextRequest, ctx: RequestContext) {
-    return router.run(request, ctx)
+export async function GET(request: NextRequest, ctx: RequestContext):Promise<NextResponse> {
+    return router.run(request, ctx) as Promise<NextResponse>;
 }
 
 export async function PUT(request: NextRequest, ctx: RequestContext): Promise<NextResponse> {
-    return router.run(request, ctx) as Promise<NextResponse>
+    return router.run(request, ctx) as Promise<NextResponse>;
 }

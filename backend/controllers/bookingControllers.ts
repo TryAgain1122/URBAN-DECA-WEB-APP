@@ -36,6 +36,7 @@ export const newBooking = catchAsyncErrors(async (req: NextRequest) => {
   });
 });
 
+
 // Check Room Booking Availability   =>  /api/bookings/check
 export const checkRoomBookingAvailability = catchAsyncErrors(
   async (req: NextRequest) => {

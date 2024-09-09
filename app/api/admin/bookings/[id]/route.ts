@@ -5,7 +5,7 @@ import {
   isAuthenticatedUser,
 } from "@/backend/middlewares/auth";
 import { createEdgeRouter } from "next-connect";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 interface RequestContext {
   params: {
@@ -20,10 +20,5 @@ dbConnect();
 router.use(isAuthenticatedUser, authorizeRoles("admin")).delete(deleteBooking);
 
 export async function DELETE(request: NextRequest, ctx: RequestContext) {
-  try {
-    const result = await router.run(request, ctx);
-    return result || NextResponse.json({ success: false}, { status: 500});
-  } catch (error) {
-    return NextResponse.json({error: "Something went wrong"}, {status: 500})
-  }
+  return router.run(request, ctx);
 }

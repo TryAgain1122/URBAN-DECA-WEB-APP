@@ -275,18 +275,19 @@ export const allAdminBookings = catchAsyncErrors(async (req: NextRequest) => {
   })
 })
 
-//Delete booking => /api/admin/bookings/:id
-export const deleteBooking = catchAsyncErrors(async (req: NextRequest, {params}: {params: {id: string}}) => {
-  const booking = await Booking.findById(params.id);
+// Delete booking   =>  /api/admin/bookings/:id
+export const deleteBooking = catchAsyncErrors(
+  async (req: NextRequest, { params }: { params: { id: string } }) => {
+    const booking = await Booking.findById(params.id);
 
-  if (!booking) {
-    throw new ErrorHandler("Booking not found with this ID", 404)
+    if (!booking) {
+      throw new ErrorHandler("Booking not found with this ID", 404);
+    }
+
+    await booking?.deleteOne();
+
+    return NextResponse.json({
+      success: true,
+    });
   }
-
-  await booking?.deleteOne();
-  
-  return NextResponse.json({
-    success: true,
-    message: "Booking deleted successfully"
-  }, { status: 200})
-})
+);

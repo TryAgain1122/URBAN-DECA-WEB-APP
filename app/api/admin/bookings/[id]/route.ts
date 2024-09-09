@@ -19,5 +19,6 @@ router.use(isAuthenticatedUser, authorizeRoles("admin")).delete(deleteBooking);
 
 export const DELETE = async (request: NextRequest, ctx: RequestContext) => {
   const response = await router.run(request, ctx);
+  console.log(response)
   return response;
 }

@@ -13,12 +13,7 @@ const router = createEdgeRouter<NextRequest, RequestContext>();
 
 router.use(isAuthenticatedUser, authorizeRoles("admin")).delete(deleteBooking);
 
-// export async function DELETE(request:NextRequest, ctx:RequestContext) {
-//     return router.run(request, ctx);
-// }
-
-export const DELETE = async (request: NextRequest, ctx: RequestContext) => {
-  const response = await router.run(request, ctx);
-  console.log(response)
-  return response;
+export default async function DELETE(request:NextRequest, ctx:RequestContext) {
+    return router.run(request, ctx);
 }
+

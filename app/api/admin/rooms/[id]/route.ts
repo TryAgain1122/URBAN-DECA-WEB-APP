@@ -20,8 +20,8 @@ dbConnect();
 router.use(isAuthenticatedUser, authorizeRoles("admin")).put(updateRoom);
 router.use(isAuthenticatedUser, authorizeRoles("admin")).delete(deleteRoom);
 
-export async function PUT(request: NextRequest, ctx: RequestContext) {
-  return router.run(request, ctx);
+export async function PUT(request: NextRequest, ctx: RequestContext): Promise<NextResponse> {
+  return router.run(request, ctx) as Promise<NextResponse>;
 }
 
 export async function DELETE(request: NextRequest, ctx: RequestContext): Promise<NextResponse> {

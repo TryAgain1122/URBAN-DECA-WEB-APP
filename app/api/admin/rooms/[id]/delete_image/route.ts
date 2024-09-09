@@ -7,7 +7,7 @@ import {
   isAuthenticatedUser,
 } from "@/backend/middlewares/auth";
 import { createEdgeRouter } from "next-connect";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 interface RequestContext {
   params: {
@@ -21,6 +21,6 @@ dbConnect();
 
 router.use(isAuthenticatedUser, authorizeRoles("admin")).put(deleteRoomImage);
 
-export async function PUT(request: NextRequest, ctx: RequestContext) {
-  return router.run(request, ctx);
+export async function PUT(request: NextRequest, ctx: RequestContext): Promise<NextResponse>{
+  return router.run(request, ctx) as Promise<NextResponse>;
 }

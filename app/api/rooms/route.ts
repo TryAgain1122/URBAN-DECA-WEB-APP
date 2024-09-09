@@ -16,6 +16,6 @@ dbConnect();
 
 router.get(allRooms)
 
-export async function GET(req: NextRequest, ctx: RequestContext) {
-    return router.run(req, ctx)
+export async function GET(req: NextRequest, ctx: RequestContext): Promise<NextResponse> {
+    return router.run(req, ctx) as Promise<NextResponse>;
 }

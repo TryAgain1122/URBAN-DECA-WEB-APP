@@ -79,7 +79,7 @@ const UpdateRoom = ({ data }: Props) => {
       router.refresh()
       toast.success("Room Updated");
     }
-  }, [error, isSuccess]);
+  }, [error, isSuccess, router]);
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -233,7 +233,7 @@ const UpdateRoom = ({ data }: Props) => {
 
                 {/* Room Features */}
                 {roomFeatures?.map((feature) => (
-                  <div className="form-check">
+                  <div className="form-check" key={feature.name}>
                     <input
                       className="form-check-input"
                       type="checkbox"

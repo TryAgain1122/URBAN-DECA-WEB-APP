@@ -22,6 +22,7 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
+import { RiRouterLine } from "react-icons/ri";
 
 interface Props {
   data: {
@@ -69,7 +70,7 @@ const UploadRoomImages = ({ data }: Props) => {
       router.refresh();
       toast.success("Images Uploaded");
     }
-  }, [error, isSuccess]);
+  }, [error, isSuccess, router]);
 
   useEffect(() => {
 
@@ -84,7 +85,7 @@ const UploadRoomImages = ({ data }: Props) => {
       router.refresh();
       toast.success("Image Deleted");
     }
-  }, [deleteError, isDeleteSuccess]);
+  }, [deleteError, isDeleteSuccess, router]);
 
   const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const files = Array.from(e.target.files || []);
@@ -177,8 +178,8 @@ const UploadRoomImages = ({ data }: Props) => {
                   <div>
                     <p>New Images</p>
                     <div>
-                      {images?.map((img) => (
-                        <div>
+                      {images?.map((img, index) => (
+                        <div key={index}>
                           <Card>
                             <CardBody>
                               <div className="flex flex-row justify-between">
@@ -211,7 +212,7 @@ const UploadRoomImages = ({ data }: Props) => {
                 <p>Room Uploaded Images</p>
                 <div>
                   {uploadedImages?.map((img) => (
-                    <Card>
+                    <Card key={img.public_id}>
                       <CardBody>
                         <div className="flex flex-row justify-between">
                           <Image

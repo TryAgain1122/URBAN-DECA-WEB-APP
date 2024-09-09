@@ -17,12 +17,12 @@ import {
   Button,
   Link,
   Skeleton,
-  Spinner
+  Spinner,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import ButtonLoader from "../ButtonLoader";
+import { RiRouterLine } from "react-icons/ri";
 
 const UpdateProfile = () => {
   const [name, setName] = useState("");
@@ -37,33 +37,27 @@ const UpdateProfile = () => {
     useUpdateProfileMutation();
   const [updateSession, { data }] = useLazyUpdateSessionQuery();
 
+  if (data) dispatch(setUser(data?.user));
+
   useEffect(() => {
     if (currentUser) {
       setName(currentUser?.name);
       setEmail(currentUser?.email);
     }
-  }, [currentUser]);
 
-  useEffect(() => {
     if (error && "data" in error) {
-      const errorMessage = (error as any)?.data?.errMessage || "An error occurred";
+      const errorMessage =
+        (error as any)?.data?.errMessage || "An error occurred";
       toast.error(errorMessage);
     }
-  }, [error]);
 
-  useEffect(() => {
-    if (isSuccess) {
-      //@ts-ignore
-      updateSession(); // Update the session state
+    if (isSuccess) { 
       router.refresh();
+       //@ts-ignore
+      updateSession(); // Update the session state
+      
     }
-  }, [isSuccess]);
-
-  useEffect(() => {
-    if (data) {
-      dispatch(setUser(data?.user)); // Update user state in Redux
-    }
-  }, [data, dispatch]);
+  }, [currentUser, error, isSuccess, router]);
 
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,14 +93,16 @@ const UpdateProfile = () => {
             ) : (
               <>
                 <Input
+                  label="Name"
                   type="text"
-                  label="Fullname"
+                  name="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
                 <Input
-                  type="email"
                   label="Email"
+                  type="email"
+                  name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -120,8 +116,13 @@ const UpdateProfile = () => {
                 Close
               </Button>
             </Link>
-            <Button color="secondary" variant="faded" type="submit" isDisabled={isLoading}>
-              {isLoading ? <Spinner color="secondary" size="sm"/> : "Update"}
+            <Button
+              color="secondary"
+              variant="faded"
+              type="submit"
+              isDisabled={isLoading}
+            >
+              {isLoading ? <Spinner color="secondary" size="sm" /> : "Update"}
             </Button>
           </CardFooter>
         </Card>

@@ -84,39 +84,6 @@ const AllBookings = ({ data }:Props) => {
                 >
               <i className="fa fa-receipt text-white"></i>
             </Button>
-
-            {/* <Button isIconOnly  onPress={onOpen} color="danger">
-              <i className="fa fa-trash"></i>{" "}
-            </Button>
-            <Modal
-              backdrop="opaque"
-              isOpen={isOpen}
-              onOpenChange={onOpenChange}
-            >
-              <ModalContent>
-                {(onClose) => (
-                  <>
-                    <ModalBody>
-                      <h1 className="mt-5">Are you sure do want to delete ?</h1>
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button color="danger" variant="light" onPress={onClose}>
-                        No
-                      </Button>
-                      <Button
-                        color="secondary"
-                        onPress={onClose}
-                        onClick={() => deleteRoomHandler(booking._id as string)}
-                        isDisabled={isLoading}
-                      >
-                        Yes
-                      </Button>
-                    </ModalFooter>
-                  </>
-                )}
-              </ModalContent>
-            </Modal> */}
-
             <Button
               isIconOnly
               onPress={() => {

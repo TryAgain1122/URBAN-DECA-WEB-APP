@@ -21,7 +21,7 @@ interface Props {
 
 export const HomePage: React.FC<Props> = ({ data }) => {
   const searchParams = useSearchParams();
-  const location = searchParams.get("location")
+  const location = searchParams.get("name")
 
   const { rooms, resPerPage, filteredRoomCount } = data;
 
@@ -31,7 +31,7 @@ export const HomePage: React.FC<Props> = ({ data }) => {
         <div className="mt-5">
           <h2 className="mb-2 text-3xl font-bold">
           {location
-            ? `${rooms?.length} rooms found in ${location}`
+            ? `${rooms?.length} rooms found ${location}`
             : "All Rooms"}
           </h2>
           <Link href="/search" className="underline flex items-center gap-2">

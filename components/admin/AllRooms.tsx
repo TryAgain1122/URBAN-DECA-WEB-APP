@@ -2,7 +2,7 @@
 
 import { IBooking } from "@/backend/models/booking";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -31,11 +31,12 @@ interface Props {
 }
 
 const AllRooms = ({ data }: Props) => {
+  const [roomIdToDelete, setRoomIdToDelete] = useState<string | null>(null)
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const rooms = data?.rooms;
   const router = useRouter();
 
-  const [deleteRoom, { error, isSuccess }] = useDeleteRoomMutation();
+  const [deleteRoom, { error, isSuccess, isLoading }] = useDeleteRoomMutation();
 
   useEffect(() => {
     if (error && "data" in error) {
@@ -85,45 +86,16 @@ const AllRooms = ({ data }: Props) => {
               {" "}
               <i className="fa fa-images text-white"></i>{" "}
             </Button>
-
-            {/* <Button color="danger" variant="bordered" className="ml-2" onClick={() => deleteRoomHandler(room._id as string)}>
-              <i className="fa fa-trash"></i>{" "}
-            </Button> */}
-
-            <Button isIconOnly  onPress={onOpen} color="danger">
+            <Button
+              isIconOnly
+              onPress={() => {
+                setRoomIdToDelete(room._id as string);
+                onOpen();
+              }}
+              color="danger"
+            >
               <i className="fa fa-trash"></i>{" "}
             </Button>
-            <Modal
-              backdrop="opaque"
-              isOpen={isOpen}
-              onOpenChange={onOpenChange}
-              // classNames={{
-              //   backdrop:
-              //     "bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20",
-              // }}
-            >
-              <ModalContent>
-                {(onClose) => (
-                  <>
-                    <ModalBody>
-                      <h1 className="mt-5">Are you sure do want to delete ?</h1>
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button color="danger" variant="light" onPress={onClose}>
-                        No
-                      </Button>
-                      <Button
-                        color="secondary"
-                        onPress={onClose}
-                        onClick={() => deleteRoomHandler(room._id as string)}
-                      >
-                        Yes
-                      </Button>
-                    </ModalFooter>
-                  </>
-                )}
-              </ModalContent>
-            </Modal>
           </div>
         ),
       });
@@ -131,8 +103,10 @@ const AllRooms = ({ data }: Props) => {
     return data;
   };
 
-  const deleteRoomHandler = (id: string) => {
-    deleteRoom(id);
+  const deleteRoomHandler = () => {
+    if (roomIdToDelete) {
+      deleteRoom(roomIdToDelete);
+    }
   };
 
   const allRoomsData = setBookings();
@@ -168,6 +142,29 @@ const AllRooms = ({ data }: Props) => {
           ))}
         </TableBody>
       </Table>
+
+      <Modal backdrop="opaque" isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+            <ModalBody>
+              <h1 className="mt-5">Are you sure you want to delete?</h1>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="danger" variant="light" onPress={onClose}>No</Button>
+              <Button
+                color="secondary"
+                onPress={() => {
+                  onClose();
+                  deleteRoomHandler();
+                }}
+                isDisabled={isLoading}
+              >Yes</Button>
+            </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+    </Modal>
     </div>
   );
 };

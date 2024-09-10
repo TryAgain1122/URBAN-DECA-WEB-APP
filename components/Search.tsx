@@ -22,7 +22,7 @@ export const metadata = {
   
 const Search = () => {
   const [formData, setFormData] = useState({
-    location: "",
+    name: "",
     guests: "",
     category: "",
   });
@@ -33,7 +33,7 @@ const Search = () => {
     e.preventDefault();
 
     const queryString = [
-        formData.location && `location=${encodeURIComponent(formData.location)}`,
+        formData.name && `name=${encodeURIComponent(formData.name)}`,
         formData.guests && `guestCapacity=${encodeURIComponent(formData.guests)}`,
         formData.category && `category=${encodeURIComponent(formData.category)}`,
       ]
@@ -64,10 +64,10 @@ const Search = () => {
           <CardBody className="gap-4">
             <Input
               type="text"
-              label="Location"
-              value={formData.location}
+              label="Room Name"
+              value={formData.name}
               onChange={(e) =>
-                setFormData({ ...formData, location: e.target.value })
+                setFormData({ ...formData, name: e.target.value })
               }
             />
 
@@ -78,7 +78,7 @@ const Search = () => {
               onChange={(e) =>
                 setFormData({ ...formData, guests: e.target.value })
               }
-            >
+            > 
               {["1", "2", "3", "4", "5", "6"].map((num) => (
                 <SelectItem key={num} value={num}>
                   {num}

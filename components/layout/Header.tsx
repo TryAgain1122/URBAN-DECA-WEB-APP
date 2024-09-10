@@ -177,19 +177,19 @@ export default function Header() {
       </NavbarBrand>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
+        {/* <NavbarItem>
           <Link color="foreground" href="#">
             Features
           </Link>
-        </NavbarItem>
+        </NavbarItem> */}
         <NavbarItem>
           <DropDown />
         </NavbarItem>
-        <NavbarItem>
+        {/* <NavbarItem>
           <Link color="foreground" href="#">
             Integrations
           </Link>
-        </NavbarItem>
+        </NavbarItem> */}
       </NavbarContent>
 
       {data?.user ? (

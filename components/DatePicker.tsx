@@ -7,7 +7,6 @@ import {
   CardBody,
   Divider,
   Button,
-  Spinner,
 } from "@nextui-org/react";
 import { IRoom } from "@/backend/models/room";
 import DateRangePicker from "react-datepicker";
@@ -35,7 +34,6 @@ const DatePicker: React.FC<Props> = ({ room }) => {
 
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
-  const [newBooking] = useNewBookingMutation();
 
   const [checkBookingAvailability, { data }] =
     useLazyCheckBookingAvailabilityQuery();
@@ -81,7 +79,7 @@ const DatePicker: React.FC<Props> = ({ room }) => {
       router.replace(checkoutData?.url);
       console.log(checkoutData)
     }
-  }, [error, checkoutData]);
+  }, [error, checkoutData, router]);
 
   const bookRoom = () => {
     const amount = room.pricePerNight * daysOfStay;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -14,7 +14,6 @@ import {
   Skeleton,
   Spinner,
 } from "@nextui-org/react";
-import ButtonLoader from "../ButtonLoader";
 import { useUpdatePasswordMutation } from "@/redux/api/userApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -39,7 +38,7 @@ const UpdatedPassword = () => {
       toast.success("Password updated");
       router.refresh();
     }
-  }, [error, isSuccess]);
+  }, [error, isSuccess, router]);
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -85,7 +85,7 @@ const UploadRoomImages = ({ data }: Props) => {
       router.refresh();
       toast.success("Image Deleted");
     }
-  }, [deleteError, isDeleteSuccess, router]);
+  }, [deleteError, isDeleteSuccess, router, error]);
 
   const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const files = Array.from(e.target.files || []);

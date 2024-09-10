@@ -57,7 +57,7 @@ const UpdateProfile = () => {
       updateSession(); // Update the session state
       
     }
-  }, [currentUser, error, isSuccess, router]);
+  }, [currentUser, error, isSuccess, router, updateSession]);
 
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

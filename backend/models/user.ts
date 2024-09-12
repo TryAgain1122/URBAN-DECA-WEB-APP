@@ -11,6 +11,7 @@ export interface IUser extends Document {
     url: string;
   };
   role: string;
+  googleId?: string;
   createdAt: Date;
   resetPasswordToken: string;
   resetPasswordExpire: Date;
@@ -41,6 +42,11 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
   role: {
     type: String,
     default: "user",
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
   },
   createdAt: {
     type: Date,

@@ -4,7 +4,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { NextRequest } from "next/server";
-
+import GoogleProvider from 'next-auth/providers/google';
 type Credentials = {
   email: string;
   password: string;
@@ -45,6 +45,10 @@ async function auth(req: NextRequest, res: any) {
           return user;
         },
       }),
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID as string,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      })
     ],
     callbacks: {
       jwt: async ({ token, user }) => {

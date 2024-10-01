@@ -12,21 +12,23 @@ interface Props {
 const CustomPagination = ({ resPerPage, filteredRoomsCount }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Get current page from URL or default to 1
   let page = searchParams.get("page") || 1;
   page = Number(page);
 
-  let queryParams;
+  // Calculate total pages based on filtered room count and results per page
+  const totalPages = Math.ceil(filteredRoomsCount / resPerPage);
 
+  // Handler for page change
   const handlePerPage = (currentPage: number) => {
     if (typeof window !== "undefined") {
-      queryParams = new URLSearchParams(window.location.search);
+      const queryParams = new URLSearchParams(window.location.search);
 
-      if (queryParams.has("page")) {
-        queryParams.set("page", currentPage.toString());
-      } else {
-        queryParams.append("page", currentPage.toString());
-      }
+      // Set or update the 'page' query parameter
+      queryParams.set("page", currentPage.toString());
 
+      // Construct the new path and push it to the router
       const path = `${window.location.pathname}?${queryParams.toString()}`;
       router.push(path);
     }
@@ -38,10 +40,10 @@ const CustomPagination = ({ resPerPage, filteredRoomsCount }: Props) => {
         <Pagination
           isCompact
           showControls
-          total={resPerPage}
+          total={totalPages} // Total number of pages
           color="secondary"
-          initialPage={filteredRoomsCount}
-          onChange={handlePerPage}
+          page={page} // Use current page from URL
+          onChange={handlePerPage} // Handle page change
         />
       </div>
     </div>

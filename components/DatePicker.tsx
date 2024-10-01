@@ -121,7 +121,7 @@ const DatePicker: React.FC<Props> = ({ room }) => {
         </CardHeader>
         <CardBody className="overflow-visible py-2">
           <DateRangePicker
-            className="w-full"
+            className="custom"
             selected={checkInDate}
             onChange={onChange}
             startDate={checkInDate}

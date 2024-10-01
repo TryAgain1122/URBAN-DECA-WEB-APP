@@ -41,7 +41,7 @@ const RoomDetails: React.FC<Props> = ({ data }) => {
               <RoomFeature room={room} />
             </div>
           </div>
-          <div className="w-full md:w-1/4 mt-5 md:mt-0">
+          <div className=" mt-5 md:mt-0">
             <DatePicker room={room} />
           </div>
         </div>

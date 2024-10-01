@@ -96,3 +96,65 @@ export const webhookCheckout = async (req: NextRequest) => {
     return NextResponse.json({ errMessage: error?.message });
   }
 };
+
+// import { NextRequest, NextResponse } from "next/server";
+// import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
+// import Room from "../models/room";
+// import User from "../models/user";
+// import { headers } from "next/headers";
+// import Booking from "../models/booking";
+// import axios from 'axios'
+
+// const PAYMONGO_SECRET_KEY = process.env.PAYMONGO_SECRET_KEY;
+
+// // Generate PayMongo checkout session => /api/payment/checkout_session/:roomId
+// export const paymongoCheckoutSession = catchAsyncErrors(
+//   async (req: NextRequest, { params }: { params: { id: string } }) => {
+//     const { searchParams } = new URL(req.url);
+
+//     const checkInDate = searchParams.get("checkInDate");
+//     const checkOutDate = searchParams.get("checkOutDate");
+//     const daysOfStay = searchParams.get("daysOfStay");
+//     const roomAmount = searchParams.get("amount");
+
+//     // Get room details
+//     const room = await Room.findById(params.id);
+
+//     // Create PayMongo payment intent
+//     const paymentIntentResponse = await axios.post(
+//       "https://api.paymongo.com/v1/payment_intents",
+//       {
+//         data: {
+//           attributes: {
+//             amount: Number(roomAmount) * 100, // PayMongo accepts amount in centavos
+//             payment_method_allowed: ["card", "gcash"], // Allow card and GCash payments
+//             currency: "PHP",
+//             description: `Payment for room ${room?.name}`,
+//             metadata: {
+//               checkInDate,
+//               checkOutDate,
+//               daysOfStay,
+//               room_id: params.id,
+//               email: req.user.email,
+//             },
+//           },
+//         },
+//       },
+//       {
+//         headers: {
+//           Authorization: `Basic ${Buffer.from(PAYMONGO_SECRET_KEY as string).toString(
+//             "base64"
+//           )}`,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+
+//     const paymentIntent = paymentIntentResponse.data.data;
+
+//     return NextResponse.json({
+//       client_key: paymentIntent.attributes.client_key,
+//       payment_intent_id: paymentIntent.id,
+//     });
+//   }
+// );

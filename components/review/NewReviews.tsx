@@ -21,7 +21,7 @@ const NewReviews = () => {
         Submit Your Review
       </Button>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} className="mb-36">
         <ModalContent>
           {(onClose) => (
             <>

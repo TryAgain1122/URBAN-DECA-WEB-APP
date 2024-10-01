@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
-import DropDown from "../DropDown";
 import { Skeleton } from "@nextui-org/react";
 
 import {
@@ -23,6 +21,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { setIsAuthenticated, setUser } from "@/redux/features/userSlice";
 import LoginModal from "../auth/LoginModal";
+import ThemeSwitcher from "../ThemeSwitcher";
 
 export default function Header() {
   const { data, status } = useSession();
@@ -60,9 +59,9 @@ export default function Header() {
       </NavbarBrand>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-  
         <NavbarItem>
-          <DropDown />
+          {/* <DropDown /> */}
+          <ThemeSwitcher />
         </NavbarItem>
 
       </NavbarContent>

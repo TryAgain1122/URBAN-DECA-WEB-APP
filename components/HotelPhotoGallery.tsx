@@ -43,7 +43,7 @@ const HotelPhotoGallery: React.FC<Props> = ({ images }) => {
     setIsPaused(false); // Resume the carousel when the modal is closed
   };
   return (
-    <div className="relative w-full h-64 md:h-96">
+    <div className="relative w-full h-64 md:h-96 overflow-x-hidden rounded-lg">
       <div
         className="absolute top-0 left-0 w-full h-full flex justify-between items-center"
         onMouseEnter={() => setIsPaused(true)}
@@ -54,20 +54,6 @@ const HotelPhotoGallery: React.FC<Props> = ({ images }) => {
           className="w-full h-full flex transition-transform duration-500"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
-          {/* {images?.length > 0 ? (
-                images.map((image) => (
-                   <div style={{ widows: "100%", height: "460px" }}>
-                     <img
-                        className='w-full h-full flex flex-shrink-0'
-                        src={image?.url}
-                        alt={image?.url}
-                  
-                    />
-                   </div>
-                ))
-            ) : (
-                <div></div>
-            )} */}
           {images.map((image, index) => (
             <div
               key={index}

@@ -42,6 +42,20 @@ export const bookingApi = createApi({
       },
     }),
 
+    // paymongoCheckout: builder.query({
+    //   query({ id, checkoutData }) {
+    //     return {
+    //       url: `/payment/paymongo_checkout/${id}`,
+    //       params: {
+    //         checkInDate: checkoutData.checkInDate,
+    //         checkOutDate: checkoutData.checkOutDate,
+    //         daysOfStay: checkoutData.daysOfStay,
+    //         amount: checkoutData.amount,
+    //       },
+    //     };
+    //   },
+    // }),
+
     getSalesStats: builder.query({
       query({ startDate, endDate }) {
         return {
@@ -77,4 +91,5 @@ export const {
   useLazyGetSalesStatsQuery,
   useDeleteBookingMutation,
   useCancelBookingMutation,
+  // useLazyPaymongoCheckoutQuery
 } = bookingApi;

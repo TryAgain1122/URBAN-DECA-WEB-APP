@@ -9,12 +9,10 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Checkbox,
   Input,
   Link,
 } from "@nextui-org/react";
 import { MdEmail } from "react-icons/md";
-import { RiLockPasswordFill } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
@@ -139,7 +137,7 @@ const LoginModal = () => {
                     Close
                   </Button>
                   <Button color="secondary" type="submit" disabled={loading}>
-                    {loading ? <ButtonLoader /> : "Login"}
+                    { loading ? <ButtonLoader /> : "Login" }
                   </Button>
                 </ModalFooter>
               </form>

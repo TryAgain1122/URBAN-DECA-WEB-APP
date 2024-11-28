@@ -31,7 +31,6 @@ const MyBookings = ({ data }: Props) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [bookingList, setBookingList] = useState(data.bookings);
-  
   const router = useRouter();
   const [cancelBooking, { error, isSuccess }] = useCancelBookingMutation();
 
@@ -45,7 +44,7 @@ const MyBookings = ({ data }: Props) => {
       toast.success("Booking canceled successfully");
 
       // Update the booking list to reflect the cancelled status
-
+      
       //@ts-ignore
       setBookingList((prevBookings) =>
         prevBookings.map((booking) =>
@@ -55,6 +54,7 @@ const MyBookings = ({ data }: Props) => {
         )
       );
 
+      // Optionally refresh the page or navigate
       router.refresh();
       onOpenChange();
       setSelectedBookingId(null);
@@ -63,7 +63,7 @@ const MyBookings = ({ data }: Props) => {
 
   const cancelBookingHandler = (id: string) => {
     setSelectedBookingId(id);
-    cancelBooking(id);
+    cancelBooking(id);  // Trigger cancel booking mutation
   };
 
   const setBookings = () => {
@@ -80,7 +80,7 @@ const MyBookings = ({ data }: Props) => {
 
     bookingList.forEach((booking) => {
       const isCancelled = booking.status === "cancelled";
-      data?.rows.push({
+      data.rows.push({
         id: booking._id,
         checkin: new Date(booking?.checkInDate).toLocaleString("en-US"),
         checkout: new Date(booking?.checkOutDate).toLocaleString("en-US"),

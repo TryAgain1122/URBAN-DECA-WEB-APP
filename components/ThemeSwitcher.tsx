@@ -25,12 +25,14 @@ const ThemeSwitcher = () => {
   };
 
   return (
+    <div className="fixed bottom-8 right-4 z-50">
     <div onClick={toggleTheme} className="flex flex-col gap-2 cursor-pointer">
       <div
         className={`transition-transform duration-500 ${isSpinning ? "rotate-180" : ""}`}
       >
         {theme === "light" ? <FaRegMoon size={20}/> : <LuSun size={20}/>}
       </div>
+    </div>
     </div>
   );
 };

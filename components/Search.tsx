@@ -10,7 +10,6 @@ import {
   Image,
   Input,
   Select,
-
   SelectItem,
   Button,
 } from "@nextui-org/react";

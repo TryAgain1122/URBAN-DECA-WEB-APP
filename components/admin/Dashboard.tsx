@@ -14,14 +14,13 @@ import { Card, CardHeader, CardBody, Image, Spinner } from "@nextui-org/react";
 const Dashboard = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [buttonLoading, setButtonLoading] = useState(false); // custom button loading state
 
-  const [getSalesStats, { error, data, isLoading }] =
-    useLazyGetSalesStatsQuery();
+  const [getSalesStats, { error, data, isLoading }] = useLazyGetSalesStatsQuery();
 
   useEffect(() => {
     if (error && "data" in error) {
-      const errorMessage =
-        (error as any)?.data?.errMessage || "An error occurred";
+      const errorMessage = (error as any)?.data?.errMessage || "An error occurred";
       toast.error(errorMessage);
     }
 
@@ -33,15 +32,22 @@ const Dashboard = () => {
     }
   }, [data, startDate, endDate, error, getSalesStats]);
 
-  const submitHandler = () => {
-    getSalesStats({
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-    }).then((response) => {
+  const submitHandler = async () => {
+    setButtonLoading(true); // Set custom loading state on button click
+    try {
+      const response = await getSalesStats({
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      }).unwrap();
+
       if (response?.data && response.data.length === 0) {
         toast.error("No records found!");
       }
-    });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setButtonLoading(false); // Reset button loading state
+    }
   };
 
   if (isLoading) {
@@ -51,6 +57,7 @@ const Dashboard = () => {
       </div>
     );
   }
+
   return (
     <div className="p-4 my-5">
       <div className="flex flex-wrap justify-start items-center">
@@ -78,11 +85,12 @@ const Dashboard = () => {
           />
         </div>
         <Button
-          className="font-semibold py-2 px-5 mt-3 md:mt-0 md:ml-4 rounded-md"
+          className={`font-semibold py-2 px-5 mt-3 md:mt-0 md:ml-4 rounded-md ${buttonLoading ? "opacity-50 cursor-not-allowed" : ""}`}
           color="secondary"
           onClick={submitHandler}
+          disabled={buttonLoading || isLoading} // Disable button if loading
         >
-          Fetch
+          {buttonLoading ? <Button isLoading color="secondary"></Button> : "Fetch"}
         </Button>
       </div>
 

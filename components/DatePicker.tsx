@@ -93,20 +93,6 @@ const DatePicker: React.FC<Props> = ({ room }) => {
 
     stripeCheckout({ id: room?._id, checkoutData });
   };
-  // const bookRoom = () => {
-  //   const bookingData = {
-  //     room: room?._id,
-  //     checkInDate,
-  //     checkOutDate,
-  //     daysOfStay,
-  //     amountPaid: room.pricePerNight * daysOfStay,
-  //     paymentInfo: {
-  //       id: "STRIPE_ID",
-  //       status: "PAID",
-  //     },
-  //   };
-  //   newBooking(bookingData);
-  // };
 
   return (
     <div>
@@ -143,8 +129,8 @@ const DatePicker: React.FC<Props> = ({ room }) => {
           )}
 
           {isAvailable == false && (
-            <p className="mt-3 px-3">
-              Room not Available. Try different dates.
+            <p className="mt-3 px-3 text-center">
+              Room not Available.
             </p>
           )}
 

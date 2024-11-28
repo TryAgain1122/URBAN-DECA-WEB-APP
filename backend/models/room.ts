@@ -41,6 +41,7 @@ export interface IRoom extends Document {
   category: string;
   reviews: IReview[];
   user: IUser;
+  isAvailable: boolean;
   createdAt: Date;
 }
 
@@ -156,6 +157,10 @@ const roomSchema: Schema<IRoom> = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: false,
+  },
+  isAvailable: {
+    type: Boolean,
+    default: false,
   },
   createdAt: {
     type: Date,

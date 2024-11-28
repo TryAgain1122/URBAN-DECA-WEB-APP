@@ -2,7 +2,6 @@
 
 import { IRoom } from "@/backend/models/room";
 import React from "react";
-import StarRatings from "react-star-ratings";
 import Container from "../Container";
 import HotelPhotoGallery from "../HotelPhotoGallery";
 import RoomFeature from "./RoomFeature";
@@ -12,41 +11,79 @@ import DatePicker from "../DatePicker";
 
 interface Props {
   data: {
-    room: IRoom;
+    room: IRoom | null;
   };
 }
+
 const RoomDetails: React.FC<Props> = ({ data }) => {
-  const { room } = data;
+  const room = data?.room;
+
+  // Utility function to detect and format bullet points
+  const formatDescription = (description: string) => {
+    const lines = description.split(/•|\n/).map((line) => line.trim());
+    return (
+      <ul className="list-disc list-inside space-y-2">
+        {lines.map(
+          (line, index) => line && <li key={index}>{line}</li>
+        )}
+      </ul>
+    );
+  };
+
+  if (!room) {
+    return (
+      <Container>
+        <div className="text-center mt-10">
+          <p className="text-xl font-semibold text-gray-700">
+            Room details are not available.
+          </p>
+        </div>
+      </Container>
+    );
+  }
+
   return (
     <Container>
-      <div className="mx-auto mt-10 px-3">
+      <div className="mx-auto mt-10 px-4 max-w-7xl">
         <HotelPhotoGallery images={room?.images} />
-        <div className="md:grid md:grid-cols-12 gap-10 mt-8">
-          <div className="md:col-span-8 w-full">
+        <div className="md:grid md:grid-cols-12 gap-8 mt-8">
+          <div className="md:col-span-8">
             <div className="text-left text-lg md:text-2xl">
-              <p className="font-bold">{room.name}</p>
-              <p className="text-md font-semi-bold mt-7">{room.address}</p>
+              <h1 className="font-bold">{room.name}</h1>
+              <p className="text-md font-semibold mt-2 text-gray-600">
+                {room.address}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="md:flex md:justify-between flex-wrap mt-5">
-          <div className="mb-11 px-3 md:w-3/4 w-full flex flex-col gap-5">
+        <div className="md:flex md:justify-between flex-wrap mt-6">
+          <div className="mb-8 md:w-8/12 w-full">
             <div>
-              <h2 className="font-bold text-2xl md:text-3xl mb-2 text-left">Description</h2>
-              <p>{room.description}</p>
+              <h2 className="font-bold text-2xl md:text-3xl mb-4">
+                Description
+              </h2>
+              {room?.description?.includes("•") ? (
+                formatDescription(room.description)
+              ) : (
+                <p className="text-gray-700">{room.description || "No description available."}</p>
+              )}
             </div>
-            <div className="mb-11">
-              <h2 className="font-bold text-2xl md:text-3xl mb-2">Room Features</h2>
+
+            <div className="mt-6">
+              <h2 className="font-bold text-2xl md:text-3xl mb-4">
+                Room Features
+              </h2>
               <RoomFeature room={room} />
             </div>
+
           </div>
-          <div className=" mt-5 md:mt-0">
+          <div className="  mt-6 md:mt-0">
             <DatePicker room={room} />
           </div>
         </div>
 
-        <div className="px-3 mt-8">
+        <div className="mt-10">
           <NewReviews />
           <ListReviews />
         </div>

@@ -4,7 +4,7 @@ import Booking, { IBooking } from "../models/booking";
 import Moment from "moment";
 import { extendMoment } from "moment-range";
 import ErrorHandler from "../utils/errorHandler";
-
+import Room from '../models/room'
 const moment = extendMoment(Moment);
 
 // Create new Booking   =>  /api/bookings
@@ -122,13 +122,21 @@ export const cancelBooking = catchAsyncErrors(
     }
 
     // Check if the user owns the booking
-    if (!req.user ||  booking.user._id?.toString() !== req.user._id) {
+    if (!req.user || booking.user._id?.toString() !== req.user._id) {
       throw new ErrorHandler("You are not authorized to cancel this booking", 403);
     }
 
     // Update booking status to canceled
     booking.status = "cancelled";
+    booking.cancellationConfirmed = true;
     await booking.save();
+
+    // Update the room's availability for the canceled booking date range
+    await updateRoomAvailability(
+      booking.room._id, // Assuming room is an ObjectId
+      booking.checkInDate, 
+      booking.checkOutDate
+    );
 
     return NextResponse.json({
       success: true,
@@ -137,6 +145,30 @@ export const cancelBooking = catchAsyncErrors(
   }
 );
 
+// Function to update room availability 
+const updateRoomAvailability = async (roomId: string, checkInDate: Date, checkOutDate: Date) => {
+  const room = await Room.findById(roomId);
+
+  if (!room) {
+    throw new ErrorHandler("Room not found", 404);
+  }
+
+  if (room.unavailableDates) {
+    room.unavailableDates = room.unavailableDates.filter(
+      (dateRange: { startDate: Date; endDate: Date }) => 
+        !(dateRange.startDate <= checkInDate && dateRange.endDate >= checkOutDate)
+    );
+  } else {
+    room.unavailableDates = [];
+  }
+
+  room.unavailableDates.push({
+    startDate: checkInDate,
+    endDate: checkOutDate,
+  });
+
+  await room.save();
+};
 
 const getLastSixMonthsSales = async () => {
   const last6MonthsSales: any = [];

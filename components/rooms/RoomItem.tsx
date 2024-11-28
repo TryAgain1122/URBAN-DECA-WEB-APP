@@ -4,9 +4,6 @@ import {
   Image,
   Button,
   Link,
-  Card,
-  CardBody,
-  CardFooter,
 } from "@nextui-org/react";
 import { IRoom } from "@/backend/models/room";
 

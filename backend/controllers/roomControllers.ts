@@ -216,7 +216,7 @@ export const canReview = catchAsyncErrors(async (req: NextRequest) => {
 
 // Get all rooms - ADMIN => /api/admin/rooms 
 export const allAdminRooms = catchAsyncErrors(async (req: NextRequest) => {
-  const rooms = await Room.find()
+  const rooms = await Room.find().sort({ createdAt: - 1 })
 
   return NextResponse.json({
       rooms,

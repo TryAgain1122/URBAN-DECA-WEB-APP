@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -16,6 +16,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Pagination,
 } from "@nextui-org/react";
 import { IUser } from "@/backend/models/user";
 import { useRouter } from "next/navigation";
@@ -35,6 +36,9 @@ const AllUsers = ({ data }: Props) => {
   const router = useRouter();
 
   const [deleteUser, { error, isLoading, isSuccess }] = useDeleteUserMutation();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (error && "data" in error) {
@@ -114,26 +118,50 @@ const AllUsers = ({ data }: Props) => {
   };
 
   const userData = setUsers();
+  const totelPages = Math.ceil(userData.rows.length / itemsPerPage);
+
+  const currentRows = userData.rows.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
-    <Table className="px-5 mt-10">
-      <TableHeader>
-        {userData.columns.map((column, index) => (
-          <TableColumn key={index}>{column.label}</TableColumn>
-        ))}
-      </TableHeader>
-      <TableBody>
-        {userData.rows.map((row, index) => (
-          <TableRow key={index}>
-            <TableCell>{row.id}</TableCell>
-            <TableCell>{row.name}</TableCell>
-            <TableCell>{row.email}</TableCell>
-            <TableCell>{row.role}</TableCell>
-            <TableCell>{row.actions}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <>
+      <h1 className="text-2xl my-5">{users?.length} Users</h1>
+      <Table
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="danger"
+              page={currentPage}
+              total={totelPages}
+              onChange={(page) => setCurrentPage(page)}
+            />
+          </div>
+        }
+        className="px-5 mt-10"
+      >
+        <TableHeader>
+          {userData.columns.map((column, index) => (
+            <TableColumn key={index}>{column.label}</TableColumn>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {currentRows.map((row, index) => (
+            <TableRow key={index}>
+              <TableCell>{row.id}</TableCell>
+              <TableCell>{row.name}</TableCell>
+              <TableCell>{row.email}</TableCell>
+              <TableCell>{row.role}</TableCell>
+              <TableCell>{row.actions}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
   );
 };
 

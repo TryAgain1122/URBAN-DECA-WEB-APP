@@ -33,7 +33,7 @@ const Dashboard = () => {
   }, [data, startDate, endDate, error, getSalesStats]);
 
   const submitHandler = async () => {
-    setButtonLoading(true); // Set custom loading state on button click
+    setButtonLoading(true);
     try {
       const response = await getSalesStats({
         startDate: startDate.toISOString(),
@@ -85,12 +85,12 @@ const Dashboard = () => {
           />
         </div>
         <Button
-          className={`font-semibold py-2 px-5 mt-3 md:mt-0 md:ml-4 rounded-md ${buttonLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-          color="secondary"
+          className={`font-semibold py-2 px-5 mt-3  md:ml-4 rounded-md ${buttonLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+          color="danger"
           onClick={submitHandler}
           disabled={buttonLoading || isLoading} // Disable button if loading
         >
-          {buttonLoading ? <Button isLoading color="secondary"></Button> : "Fetch"}
+          {buttonLoading ? <Button isLoading color="danger"></Button> : "Submit"}
         </Button>
       </div>
 
@@ -114,7 +114,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardBody>
               {data?.topRooms?.length > 0 ? (
-                <div style={{ width: "100%", height: "400px" }}>
+                <div style={{ width: "100%", height: "500px" }}>
                   <TopPerformingChart rooms={data?.topRooms} />
                 </div>
               ) : (

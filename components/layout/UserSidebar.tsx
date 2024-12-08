@@ -50,7 +50,7 @@ const UserSidebar = () => {
                     aria-current={activeMenuItem === menuItem.url ? "true" : "false"}
                     onClick={() => handleMenuItemClick(menuItem.url)}
                     className={`flex items-center py-3 px-5 transition-colors duration-200 ${
-                        activeMenuItem === menuItem.url ? "bg-[#C9A9E9]" : " hover:bg-[#F2EAFA] rounded-md"
+                        activeMenuItem === menuItem.url ? "bg-[#F871A0]" : " hover:bg-[#F54180] rounded-md"
                       }`}
 
                 >

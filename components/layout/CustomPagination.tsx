@@ -41,7 +41,7 @@ const CustomPagination = ({ resPerPage, filteredRoomsCount }: Props) => {
           isCompact
           showControls
           total={totalPages} // Total number of pages
-          color="secondary"
+          color="danger"
           page={page} // Use current page from URL
           onChange={handlePerPage} // Handle page change
         />

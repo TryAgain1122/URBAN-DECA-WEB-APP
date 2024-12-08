@@ -66,9 +66,9 @@ const UpdateProfile = () => {
   };
 
   return (
-    <div>
+    <div className="px-5">
       <form onSubmit={submitHandler}>
-        <Card className="max-w-[500px] mx-auto mt-24">
+        <Card className="w-full mx-auto mt-24">
           <CardHeader className="flex gap-3">
             <Image
               alt="nextui logo"

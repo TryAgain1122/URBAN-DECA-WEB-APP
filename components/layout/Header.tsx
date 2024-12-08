@@ -44,9 +44,9 @@ export default function Header() {
   }, [status, data, dispatch]);
 
   return (
-    <Navbar>
+    <Navbar className="w-full">
       <NavbarBrand>
-        <Link href="/" color="secondary">
+        <Link href="/" color="danger">
           <Image
             src={"/images/logo.png"}
             alt="no-image"
@@ -76,7 +76,7 @@ export default function Header() {
                   isBordered
                   as="button"
                   className="transition-transform"
-                  color="secondary"
+                  color="danger"
                   name="Jason Hughes"
                   size="md"
                   src={
@@ -89,7 +89,7 @@ export default function Header() {
                 />
               </div>
             </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" variant="flat">
+            <DropdownMenu aria-label="Profile Actions" color="danger" variant="flat">
               <DropdownItem key="profile" className="h-14 gap-2">
                 <p className="font-semibold">Signed in as</p>
                 <p className="font-semibold">{data?.user?.email}</p>
@@ -110,7 +110,7 @@ export default function Header() {
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="text-medium"
                 >
-                  logout
+                  Logout
                 </button>
               </DropdownItem>
             </DropdownMenu>

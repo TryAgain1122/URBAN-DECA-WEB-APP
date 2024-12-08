@@ -4,7 +4,7 @@ import {Spinner} from "@nextui-org/react";
 
 const Loader = () => {
   return (
-    <Spinner label="Loading..." color="secondary" />
+    <Spinner label="Loading..." color="danger" />
   )
 }
 

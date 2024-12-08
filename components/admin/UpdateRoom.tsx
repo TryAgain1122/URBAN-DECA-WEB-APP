@@ -75,8 +75,8 @@ const UpdateRoom = ({ data }: Props) => {
       toast.error(errorMessage);
     }
     if (isSuccess) {
-      revalidateTag("RoomDetails")
-      router.refresh()
+      revalidateTag("RoomDetails");
+      router.refresh();
       toast.success("Room Updated");
     }
   }, [error, isSuccess, router]);
@@ -124,140 +124,140 @@ const UpdateRoom = ({ data }: Props) => {
     { name: "Room Cleaning", value: "roomCleaning" },
   ];
   return (
-    <div>
-      <>
-        <form onSubmit={submitHandler}>
-          <Card className="max-w-[500px] mt-10">
-            <CardHeader className="flex gap-3">
-              <Image
-                alt="nextui logo"
-                height={40}
-                radius="sm"
-                src="/images/logo.png"
-                width={40}
+    <div className="flex justify-center items-center py-10 px-4">
+      <form onSubmit={submitHandler} className="w-full max-w-4xl">
+        <Card className="w-full">
+          <CardHeader className="flex items-center gap-3">
+            <Image
+              alt="nextui logo"
+              height={40}
+              radius="sm"
+              src="/images/logo.png"
+              width={40}
+            />
+            <div className="flex flex-col">
+              <p className="text-lg font-semibold">Urban Deca Tower</p>
+              <p className="text-sm text-gray-500">Update Room Details</p>
+            </div>
+          </CardHeader>
+          <Divider />
+          <CardBody className="grid md:grid-cols-2 grid-cols-1 gap-6">
+            <div className="flex flex-col gap-4">
+              <Input
+                type="text"
+                label="Name"
+                name="name"
+                onChange={onChange}
+                value={name}
+                isRequired
               />
-              <div className="flex flex-col">
-                <p className="text-md">Urban Deca Tower</p>
-                <p className="text-small text-default-500">Search</p>
-              </div>
-            </CardHeader>
-            <Divider />
-            <CardBody className="gap-4 grid md:grid-cols-2 grid-cols-1">
-              <div className="gap-3">
-                <Input
-                  type="text"
-                  label="Name"
-                  name="name"
-                  className="mb-4"
-                  onChange={onChange}
-                  value={name}
-                  isRequired
-                />
-                <Input
-                  type="text"
-                  label="Price"
-                  name="price"
-                  className="mb-4"
-                  onChange={onChange}
-                  value={price.toString()}
-                  isRequired
-                />
-
-                <Textarea
-                  label="Description"
-                  variant="bordered"
-                  placeholder="Enter your description"
-                  disableAnimation
-                  disableAutosize
-                  name="description"
-                  value={description}
-                  onChange={onChange}
-                  classNames={{
-                    base: "w-full mb-4",
-                    input: "resize-y min-h-[40px]",
-                  }}
-                />
-
-                <Input
-                  type="text"
-                  label="Address"
-                  name="address"
-                  required
-                  className="mb-4"
-                  onChange={onChange}
-                  value={address}
-                  isRequired
-                />
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <select
-                  className={selectStyles}
-                  id="room_type_field"
-                  name="category"
-                  value={category}
-                  onChange={onChange}
-                >
-                  {["King", "Single", "Twins"].map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className={selectStyles}
-                  name="guestCapacity"
-                  value={guestCapacity}
-                  onChange={onChange}
-                >
-                  {[1, 2, 3, 4, 5, 6].map((num) => (
-                    <option key={num} value={num}>
-                      {num}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  id="numofbeds_field"
-                  name="numOfBeds"
-                  value={numOfBeds}
-                  onChange={onChange}
-                  className={selectStyles}
-                >
-                  {[1, 2, 3].map((num) => (
-                    <option key={num} value={num}>
-                      {num}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Room Features */}
-                {roomFeatures?.map((feature) => (
-                  <div className="form-check" key={feature.name}>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id={feature.name}
-                      name={feature.value}
-                      onChange={onChange}
-                      checked={!!roomDetails[feature.value]}
-                    />
-                    <label className="form-check-label" htmlFor={feature.name}>
-                      {feature.name}
-                    </label>
-                  </div>
+              <Input
+                type="text"
+                label="Price"
+                name="price"
+                onChange={onChange}
+                value={price.toString()}
+                isRequired
+              />
+              <Input
+                type="text"
+                label="Address"
+                name="address"
+                onChange={onChange}
+                value={address}
+                isRequired
+              />
+            </div>
+            <div className="flex flex-col gap-4">
+              <select
+                className={selectStyles}
+                id="room_type_field"
+                name="category"
+                value={category}
+                onChange={onChange}
+              >
+                {["King", "Single", "Twins"].map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
                 ))}
-              </div>
-            </CardBody>
-            <Divider />
-            <CardFooter className="w-full">
-            <Button color="secondary" variant="faded" type="submit" isDisabled={isLoading}>
-              {isLoading ? <Spinner color="secondary" size="sm"/> : "Update"}
+              </select>
+              <select
+                className={selectStyles}
+                name="guestCapacity"
+                value={guestCapacity}
+                onChange={onChange}
+              >
+                {[1, 2, 3, 4, 5, 6].map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
+                ))}
+              </select>
+              <select
+                id="numofbeds_field"
+                name="numOfBeds"
+                value={numOfBeds}
+                onChange={onChange}
+                className={selectStyles}
+              >
+                {[1, 2, 3].map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="md:col-span-2">
+              <Textarea
+                label="Description"
+                variant="bordered"
+                placeholder="Enter your description"
+                disableAnimation
+                disableAutosize
+                name="description"
+                value={description}
+                onChange={onChange}
+                classNames={{
+                  base: "w-full",
+                  input: "resize-y min-h-[40px]",
+                }}
+              />
+            </div>
+            <div className="md:col-span-2 grid grid-cols-2 gap-4">
+              {roomFeatures?.map((feature) => (
+                <div className="flex items-center gap-2" key={feature.name}>
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id={feature.name}
+                    name={feature.value}
+                    onChange={onChange}
+                    checked={!!roomDetails[feature.value]}
+                  />
+                  <label
+                    className="form-check-label text-gray-700 dark:text-gray-300"
+                    htmlFor={feature.name}
+                  >
+                    {feature.name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+          <Divider />
+          <CardFooter className="flex justify-end">
+            <Button
+              color="secondary"
+              variant="faded"
+              type="submit"
+              isDisabled={isLoading}
+            >
+              {isLoading ? <Spinner color="danger" size="sm" /> : "Update"}
             </Button>
-            </CardFooter>
-          </Card>
-        </form>
-      </>
+          </CardFooter>
+        </Card>
+      </form>
     </div>
   );
 };

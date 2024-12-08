@@ -19,7 +19,7 @@ const RoomItem: React.FC<Props> = ({ room }) => {
           width={240}
           alt={room?.name}
           src={
-            room?.images?.length > 0 ? room.images[0].url : "/images/image1.jpg"
+            room?.images?.length > 0 ? room.images[0].url : "/images/logo.png"
           }
           className="cursor-pointer w-full h-[300px]"
         />
@@ -46,6 +46,7 @@ const RoomItem: React.FC<Props> = ({ room }) => {
             as={Link}
             variant="solid"
             className="w-56 mt-2 ml-2"
+            color="danger"
           >
             View Details{" "}
           </Button>

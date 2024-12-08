@@ -141,13 +141,6 @@ const UploadRoomImages = ({ data }: Props) => {
       <form>
         <Card className="max-w-[500px] mt-24">
           <CardHeader className="flex gap-3">
-            {/* <Image
-              alt="nextui logo"
-              height={40}
-              radius="sm"
-                src={avatarPreview}
-              width={40}
-            /> */}
             <div className="flex flex-col">
               <p className="text-md">Urban Deca Tower</p>
               <p className="text-small text-default-500">Choose image</p>

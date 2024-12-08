@@ -71,7 +71,7 @@ export const getRoomBookedDates = catchAsyncErrors(async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
   const roomId = searchParams.get("roomId");
 
-  const bookings = await Booking.find({ room: roomId });
+  const bookings = await Booking.find({ room: roomId }).sort({ createdAt: -1 });
 
   const bookedDates = bookings.flatMap((booking) =>
     Array.from(
@@ -88,7 +88,7 @@ export const getRoomBookedDates = catchAsyncErrors(async (req: NextRequest) => {
 
 // Get current user bookings   =>  /api/bookings/me
 export const myBookings = catchAsyncErrors(async (req: NextRequest) => {
-  const bookings = await Booking.find({ user: req.user._id });
+  const bookings = await Booking.find({ user: req.user._id }).sort({ createdAt: -1 });
 
   return NextResponse.json({
     bookings,
@@ -301,7 +301,7 @@ export const getSalesStats = catchAsyncErrors(async (req: NextRequest) => {
 
 //Get admin Bookings  => api/admin/bookings
 export const allAdminBookings = catchAsyncErrors(async (req: NextRequest) => {
-  const bookings = await Booking.find();
+  const bookings = await Booking.find().sort({ createdAt: -1 });
 
   return NextResponse.json({
     bookings,

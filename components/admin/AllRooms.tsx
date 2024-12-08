@@ -18,6 +18,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Pagination,
 } from "@nextui-org/react";
 import { IRoom } from "@/backend/models/room";
 import { useRouter } from "next/navigation";
@@ -35,6 +36,9 @@ const AllRooms = ({ data }: Props) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const rooms = data?.rooms;
   const router = useRouter();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // Number of items per page
 
   const [deleteRoom, { error, isSuccess, isLoading }] = useDeleteRoomMutation();
 
@@ -110,6 +114,12 @@ const AllRooms = ({ data }: Props) => {
   };
 
   const allRoomsData = setBookings();
+  const totalPages = Math.ceil(allRoomsData.rows.length / itemsPerPage);
+
+  const currentRows = allRoomsData.rows.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div>
@@ -120,20 +130,34 @@ const AllRooms = ({ data }: Props) => {
             href="/admin/rooms/new"
             as={Link}
             className="mt-0 absolute right-0"
-            color="secondary"
+            color="danger"
           >
             Create Room
           </Button>
         </h1>
       </div>
-      <Table className="px-5 mt-10">
+      <Table 
+      bottomContent={
+        <div className="flex w-full justify-center">
+          <Pagination 
+            isCompact
+            showControls
+            showShadow
+            color="danger"
+            page={currentPage}
+            total={totalPages}
+            onChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      }
+      className="px-5 mt-10">
         <TableHeader>
           {allRoomsData.columns.map((column, index) => (
             <TableColumn key={index}>{column.label}</TableColumn>
           ))}
         </TableHeader>
         <TableBody>
-          {allRoomsData.rows.map((row, index) => (
+          {currentRows.map((row, index) => (
             <TableRow key={index}>
               <TableCell>{row.id}</TableCell>
               <TableCell>{row.name}</TableCell>

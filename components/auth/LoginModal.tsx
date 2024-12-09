@@ -55,7 +55,7 @@ const LoginModal = () => {
   return (
     <>
       {/* <form onSubmit={submitHandler}> */}
-      <Button onPress={onOpen} color="secondary">
+      <Button onPress={onOpen} color="danger">
         Login
       </Button>
       <Modal
@@ -133,10 +133,10 @@ const LoginModal = () => {
                   </div>
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="danger" variant="flat" onPress={onClose}>
+                  <Button color="default" variant="flat" onPress={onClose}>
                     Close
                   </Button>
-                  <Button color="secondary" type="submit" disabled={loading}>
+                  <Button color="danger" type="submit" disabled={loading}>
                     { loading ? <ButtonLoader /> : "Login" }
                   </Button>
                 </ModalFooter>

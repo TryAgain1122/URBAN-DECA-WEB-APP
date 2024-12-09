@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useNewRoomMutation } from "@/redux/api/roomApi";
 import toast from "react-hot-toast";
 import axios from "axios"; // for image upload (you can use other libraries too)
+import { upload_file } from "@/backend/utils/cloudinary";
 
 // Type definition for room details
 interface RoomDetails {
@@ -88,6 +89,7 @@ const NewRoom = () => {
   const SubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    
     // Prepare the room data
     const roomData = {
       name,

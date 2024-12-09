@@ -37,16 +37,40 @@ export const allRooms = catchAsyncErrors(async (req: NextRequest) => {
 // Create new room  =>  /api/admin/rooms
 export const newRoom = catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
-
-  body.user = req.user._id
+  let imageLinks: { public_id: string; url: string }[] = []; // Declare imageLinks here
+  body.user = req.user._id;
 
   const room = await Room.create(body);
+
+  // Function to upload each image
+  const uploader = async (image: string) => upload_file(image, "urban/rooms");
+
+  // Check if images are provided and upload them
+  if (body?.images && Array.isArray(body.images)) {
+    // Map through each image and upload it
+    const uploadResults = await Promise.all(
+      body.images.map(async (image: string) => {
+        const result = await uploader(image); // Await the result of upload
+        return {
+          public_id: result.public_id,
+          url: result.url,
+        };
+      })
+    );
+
+    imageLinks.push(...uploadResults);
+
+    room.images.push(...imageLinks);
+    
+    await room.save();
+  }
 
   return NextResponse.json({
     success: true,
     room,
   });
 });
+
 
 // Get room details  =>  /api/rooms/:id
 export const getRoomDetails = catchAsyncErrors(

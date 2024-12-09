@@ -21,8 +21,24 @@ import { useNewRoomMutation } from "@/redux/api/roomApi";
 import toast from "react-hot-toast";
 import axios from "axios"; // for image upload (you can use other libraries too)
 
+// Type definition for room details
+interface RoomDetails {
+  name: string;
+  price: number;
+  description: string;
+  address: string;
+  category: string;
+  guestCapacity: number;
+  numOfBeds: number;
+  internet: boolean;
+  breakfast: boolean;
+  airConditioned: boolean;
+  petsAllowed: boolean;
+  roomCleaning: boolean;
+}
+
 const NewRoom = () => {
-  const [roomDetails, setRoomDetails] = useState({
+  const [roomDetails, setRoomDetails] = useState<RoomDetails>({
     name: "",
     price: 0,
     description: "",
@@ -37,7 +53,7 @@ const NewRoom = () => {
     roomCleaning: false,
   });
 
-  const [image, setImage] = useState<File | null>(null); // Add state for image
+  const [images, setImage] = useState<File[]>([]); // Store images as an array of files
 
   const {
     name,
@@ -58,8 +74,8 @@ const NewRoom = () => {
   const [newRoom, { isLoading, error, isSuccess }] = useNewRoomMutation();
 
   useEffect(() => {
-    if (error && "data" in error) {
-      const errorMessage = (error as any)?.data?.errMessage || "An error occurred";
+    if (error && (error as any)?.data?.errMessage) {
+      const errorMessage = (error as any).data.errMessage || "An error occurred";
       toast.error(errorMessage);
     }
 
@@ -72,26 +88,7 @@ const NewRoom = () => {
   const SubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let imageUrl = "";
-
-    if (image) {
-      // Handle the image upload to a server or a service like Cloudinary
-      const formData = new FormData();
-      formData.append("file", image);
-      formData.append("upload_preset", "your_cloudinary_upload_preset"); // Example for Cloudinary
-
-      try {
-        const response = await axios.post(
-          "https://api.cloudinary.com/v1_1/your_cloud_name/image/upload",
-          formData
-        );
-        imageUrl = response.data.secure_url; // Get the uploaded image URL
-      } catch (err) {
-        toast.error("Image upload failed");
-        return;
-      }
-    }
-
+    // Prepare the room data
     const roomData = {
       name,
       pricePerNight: price,
@@ -105,16 +102,15 @@ const NewRoom = () => {
       isAirConditioned: airConditioned,
       isPetsAllowed: petsAllowed,
       isRoomCleaning: roomCleaning,
-      image: imageUrl, // Add the image URL to the room data
+      images, // This is where you can add image URLs after uploading them
     };
 
+    // Here you should upload images and handle server interaction for the room data
     newRoom(roomData);
   };
 
   const onChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setRoomDetails({
       ...roomDetails,
@@ -126,12 +122,13 @@ const NewRoom = () => {
   };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files); // Convert FileList to an array
+      setImage(filesArray); // Store selected files
     }
   };
 
-  const roomFeatures: { name: string; value: keyof typeof roomDetails }[] = [
+  const roomFeatures: { name: string; value: keyof RoomDetails }[] = [
     { name: "Internet", value: "internet" },
     { name: "Breakfast", value: "breakfast" },
     { name: "Air Conditioned", value: "airConditioned" },
@@ -179,7 +176,6 @@ const NewRoom = () => {
                 isRequired
                 variant="bordered"
               />
-
               <Input
                 type="text"
                 label="Address"
@@ -238,14 +234,15 @@ const NewRoom = () => {
             </div>
 
             {/* Image Upload */}
-            {/* <Input
+            <Input
               type="file"
               label="Room Image"
               name="image"
               onChange={onImageChange}
               className="mb-4"
               accept="image/*"
-            /> */}
+              multiple // Allow multiple images
+            />
 
             {/* Room Features */}
             {roomFeatures.map((feature) => (

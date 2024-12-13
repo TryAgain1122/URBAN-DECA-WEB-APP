@@ -48,9 +48,9 @@ const UpdatedPassword = () => {
     updatePassword(passwords);
   };
   return (
-    <div>
+    <div className="pr-5">
       <form onSubmit={submitHandler}>
-        <Card className="max-w-[500px] mx-auto mt-24">
+        <Card className="w-full mx-auto mt-24">
           {isLoading ? (
             <>
               <CardHeader className="flex gap-3">
@@ -109,8 +109,8 @@ const UpdatedPassword = () => {
                   </Button>
                 </Link>
                 
-                <Button color="secondary" variant="faded" type="submit">
-                  {isLoading ? <Spinner color="secondary"/> : "Change Password"}
+                <Button variant="faded" type="submit">
+                  {isLoading ? <Spinner color="danger"/> : "Change Password"}
                 </Button>
               </CardFooter>
         </Card>

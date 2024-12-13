@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Card,
@@ -10,11 +10,8 @@ import {
   Divider,
   Image,
   Input,
-  Select,
-  SelectItem,
   Button,
   Textarea,
-  Checkbox,
   Spinner,
 } from "@nextui-org/react";
 import { IRoom } from "@/backend/models/room";
@@ -34,7 +31,7 @@ const selectStyles =
 
 const UpdateRoom = ({ data }: Props) => {
   const room = data?.room;
-
+  
   const [roomDetails, setRoomDetails] = useState({
     name: room?.name,
     price: room?.pricePerNight,
@@ -67,11 +64,13 @@ const UpdateRoom = ({ data }: Props) => {
 
   const router = useRouter();
 
+  const [images, setImages] = useState<string[]>([]);
   const [updateRoom, { isLoading, error, isSuccess }] = useUpdateRoomMutation();
 
   useEffect(() => {
     if (error && "data" in error) {
-      const errorMessage = (error as any)?.data?.errMessage || "An error occurred";
+      const errorMessage =
+        (error as any)?.data?.errMessage || "An error occurred";
       toast.error(errorMessage);
     }
     if (isSuccess) {
@@ -97,6 +96,7 @@ const UpdateRoom = ({ data }: Props) => {
       isAirConditioned: airConditioned,
       isPetsAllowed: petsAllowed,
       isRoomCleaning: roomCleaning,
+      images,
     };
 
     updateRoom({ id: room._id, body: roomData });
@@ -114,6 +114,24 @@ const UpdateRoom = ({ data }: Props) => {
           ? (e.target as HTMLInputElement).checked
           : e.target.value,
     });
+  };
+
+  const onImageChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files); 
+
+      const base64Images = await Promise.all(
+        filesArray.map((file) => {
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+          })
+        })
+      )
+      setImages(base64Images); 
+    }
   };
 
   const roomFeatures: { name: string; value: keyof typeof roomDetails }[] = [
@@ -208,7 +226,17 @@ const UpdateRoom = ({ data }: Props) => {
                 ))}
               </select>
             </div>
+
             <div className="md:col-span-2">
+            {/* <Input
+                  type="file"
+                  label="Room Image"
+                  name="image"
+                  onChange={onImageChange}
+                  className="mb-4"
+                  accept="image/*"
+                  multiple // Allow multiple images
+                /> */}
               <Textarea
                 label="Description"
                 variant="bordered"

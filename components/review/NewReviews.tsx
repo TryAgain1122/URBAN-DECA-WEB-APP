@@ -17,7 +17,7 @@ const NewReviews = () => {
 
   return (
     <>
-      <Button onPress={onOpen} color="secondary">
+      <Button onPress={onOpen} color="danger">
         Submit Your Review
       </Button>
 
@@ -47,7 +47,7 @@ const NewReviews = () => {
               </ModalBody>
               <hr />
               <ModalFooter>
-                <Button color="secondary" onPress={onClose} className="w-full">
+                <Button color="danger" onPress={onClose} className="w-full">
                   Submit
                 </Button>
               </ModalFooter>

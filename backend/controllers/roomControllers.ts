@@ -37,39 +37,81 @@ export const allRooms = catchAsyncErrors(async (req: NextRequest) => {
 // Create new room  =>  /api/admin/rooms
 export const newRoom = catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
-  let imageLinks: { public_id: string; url: string }[] = []; // Declare imageLinks here
-  body.user = req.user._id;
 
-  const room = await Room.create(body);
+  // Ensure images are valid strings
+  if (!body?.images || !Array.isArray(body.images)) {
+    throw new Error("Images must be an array.");
+  }
 
-  // Function to upload each image
-  const uploader = async (image: string) => upload_file(image, "urban/rooms");
+  if (body.images.some((img: string) => typeof img !== "string")) {
+    throw new Error("Each image must be a string (file path or base64).");
+  }
 
-  // Check if images are provided and upload them
-  if (body?.images && Array.isArray(body.images)) {
-    // Map through each image and upload it
+  // Process image uploads
+  const imageLinks: { public_id: string; url: string }[] = [];
+  try {
     const uploadResults = await Promise.all(
       body.images.map(async (image: string) => {
-        const result = await uploader(image); // Await the result of upload
-        return {
-          public_id: result.public_id,
-          url: result.url,
-        };
+        const result = await upload_file(image, "urban/rooms");
+        return { public_id: result.public_id, url: result.url };
       })
     );
-
     imageLinks.push(...uploadResults);
-
-    room.images.push(...imageLinks);
-    
-    await room.save();
+  } catch (error) {
+    console.error("Image upload failed:", error);
+    throw new Error("Failed to upload images.");
   }
+
+  body.images = imageLinks; // Attach uploaded images
+  body.user = req.user._id; // Attach user
+
+  // Create the room
+  const room = await Room.create(body);
 
   return NextResponse.json({
     success: true,
     room,
   });
 });
+
+
+// export const newRoom = catchAsyncErrors(async (req: NextRequest) => {
+//   const body = await req.json();
+//   let imageLinks: { public_id: string; url: string }[] = []; // Declare imageLinks here
+//   body.user = req.user._id;
+
+//   const room = await Room.create(body);
+
+//   // Function to upload each image
+//   const uploader = async (image: string) => upload_file(image, "urban/rooms");
+
+//   // Check if images are provided and upload them
+//   if (body?.images && Array.isArray(body.images)) {
+//     // Map through each image and upload it
+//     const uploadResults = await Promise.all(
+//       body.images.map(async (image: string) => {
+//         const result = await uploader(image); // Await the result of upload
+//         return {
+//           public_id: result.public_id,
+//           url: result.url,
+//         };
+//       })
+//     );
+
+//     console.log("Error", uploadResults);
+
+//     imageLinks.push(...uploadResults);
+
+//     room.images.push(...imageLinks);
+    
+//     await room.save();
+//   }
+
+//   return NextResponse.json({
+//     success: true,
+//     room,
+//   });
+// });
 
 
 // Get room details  =>  /api/rooms/:id

@@ -23,9 +23,7 @@ const RoomDetails: React.FC<Props> = ({ data }) => {
     const lines = description.split(/•|\n/).map((line) => line.trim());
     return (
       <ul className="list-disc list-inside space-y-2">
-        {lines.map(
-          (line, index) => line && <li key={index}>{line}</li>
-        )}
+        {lines.map((line, index) => line && <li key={index}>{line}</li>)}
       </ul>
     );
   };
@@ -46,46 +44,42 @@ const RoomDetails: React.FC<Props> = ({ data }) => {
     <Container>
       <div className="mx-auto mt-10 px-4 max-w-7xl">
         <HotelPhotoGallery images={room?.images} />
-        <div className="md:grid md:grid-cols-12 gap-8 mt-8">
-          <div className="md:col-span-8">
-            <div className="text-left text-lg md:text-2xl">
-              <h1 className="font-bold">{room.name}</h1>
-              <p className="text-md font-semibold mt-2 text-gray-600">
-                {room.address}
-              </p>
-            </div>
-          </div>
-        </div>
 
-        <div className="md:flex md:justify-between flex-wrap mt-6">
-          <div className="mb-8 md:w-8/12 w-full">
-            <div>
-              <h2 className="font-bold text-2xl md:text-3xl mb-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div className="md:col-span-8">
+            <h1 className="text-2xl md:text-3xl font-bold">{room.name}</h1>
+            <p className="text-md font-medium mt-2 text-gray-600">
+              {room.address}
+            </p>
+            <div className="mt-10">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">
                 Description
               </h2>
               {room?.description?.includes("•") ? (
                 formatDescription(room.description)
               ) : (
-                <p className="text-gray-700">{room.description || "No description available."}</p>
+                <p className="text-gray-700">
+                  {room.description || "No description available."}
+                </p>
               )}
             </div>
-
-            <div className="mt-6">
-              <h2 className="font-bold text-2xl md:text-3xl mb-4">
-                Room Features
-              </h2>
-              <RoomFeature room={room} />
-            </div>
-
           </div>
-          <div className="  mt-6 md:mt-0">
+          <div className="md:col-span-4 flex items-center justify-end">
             <DatePicker room={room} />
           </div>
         </div>
 
-        <div className="mt-10">
-          <NewReviews />
-          <ListReviews />
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div className="md:col-span-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Room Features
+            </h2>
+            <RoomFeature room={room} />
+          </div>
+          <div className="md:col-span-4">
+            <NewReviews />
+            <ListReviews />
+          </div>
         </div>
       </div>
     </Container>

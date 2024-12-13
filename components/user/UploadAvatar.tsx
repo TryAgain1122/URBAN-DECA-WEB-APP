@@ -76,9 +76,9 @@ const UploadAvatar = () => {
         reader.readAsDataURL(files[0])
     }
   return (
-    <div>
+    <div className='pr-5'>
       <form onSubmit={submitHandler}>
-        <Card className="max-w-[500px] mx-auto mt-24">
+        <Card className="w-full mx-auto mt-24">
           <CardHeader className="flex gap-3">
             <Image
               alt="nextui logo"
@@ -120,8 +120,8 @@ const UploadAvatar = () => {
                 Close
               </Button>
             </Link>
-            <Button variant="faded" color="secondary" type="submit" isDisabled={isLoading}>
-              {isLoading ? <Spinner color='secondary'/> : "Upload"}
+            <Button variant="faded" type="submit" isDisabled={isLoading}>
+              {isLoading ? <Spinner color='danger'/> : "Upload"}
             </Button>
           </CardFooter>
         </Card>

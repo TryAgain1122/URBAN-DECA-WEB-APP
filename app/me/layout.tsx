@@ -7,16 +7,16 @@ interface Props {
 
 const UserLayout: React.FC<Props> = ({ children }) => {
   return (
-    <div>
-      <div className="mx-auto">
-        <div className="flex flex-col lg:flex-row justify-around items-center">
-          <div className="w-full lg:1/4">
-            <UserSidebar />
-          </div>
-          <div className="w-full lg:2/3 user-dashboard">{children}</div>
+    <div className="min-h-screen">
+    <div className="container mx-auto">
+      <div className="flex flex-col lg:flex-row">
+        <div className="lg:w-1/4 w-full mb-5 lg:mb-0">
+          <UserSidebar />
         </div>
+        <div className="lg:w-3/4 w-full p-4">{children}</div>
       </div>
     </div>
+  </div>
   );
 };
 

@@ -54,7 +54,7 @@ const NewRoom = () => {
     roomCleaning: false,
   });
 
-  const [images, setImage] = useState<File[]>([]); // Store images as an array of files
+  const [images, setImage] = useState<string[]>([]); // Store images as an array of files
 
   const {
     name,
@@ -89,7 +89,6 @@ const NewRoom = () => {
   const SubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    
     // Prepare the room data
     const roomData = {
       name,
@@ -106,7 +105,6 @@ const NewRoom = () => {
       isRoomCleaning: roomCleaning,
       images, // This is where you can add image URLs after uploading them
     };
-
     // Here you should upload images and handle server interaction for the room data
     newRoom(roomData);
   };
@@ -123,10 +121,21 @@ const NewRoom = () => {
     });
   };
 
-  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onImageChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const filesArray = Array.from(e.target.files); // Convert FileList to an array
-      setImage(filesArray); // Store selected files
+      const filesArray = Array.from(e.target.files); 
+
+      const base64Images = await Promise.all(
+        filesArray.map((file) => {
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+            reader.readAsDataURL(file);
+          })
+        })
+      )
+      setImage(base64Images); 
     }
   };
 

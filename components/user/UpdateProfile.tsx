@@ -55,6 +55,7 @@ const UpdateProfile = () => {
       router.refresh();
        //@ts-ignore
       updateSession(); // Update the session state
+      toast.success("Updated successfully")
       
     }
   }, [currentUser, error, isSuccess, router, updateSession]);
@@ -117,12 +118,11 @@ const UpdateProfile = () => {
               </Button>
             </Link>
             <Button
-              color="secondary"
               variant="faded"
               type="submit"
               isDisabled={isLoading}
             >
-              {isLoading ? <Spinner color="secondary" size="sm" /> : "Update"}
+              {isLoading ? <Spinner color="danger" size="sm" /> : "Update"}
             </Button>
           </CardFooter>
         </Card>

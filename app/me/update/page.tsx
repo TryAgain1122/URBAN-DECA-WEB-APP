@@ -6,7 +6,7 @@ export const metadata = {
 
 const UpdateProfilePage = () => {
     return (
-      <div>
+      <div className="">
         <UpdateProfile />
       </div>
     );

@@ -11,6 +11,7 @@ import {
   useDisclosure,
   Input,
   Link,
+  Spinner,
 } from "@nextui-org/react";
 import { MdEmail } from "react-icons/md";
 import { useRouter } from "next/navigation";
@@ -137,7 +138,7 @@ const LoginModal = () => {
                     Close
                   </Button>
                   <Button color="danger" type="submit" disabled={loading}>
-                    { loading ? <ButtonLoader /> : "Login" }
+                    { loading ? <Spinner color="danger"/> : "Login" }
                   </Button>
                 </ModalFooter>
               </form>

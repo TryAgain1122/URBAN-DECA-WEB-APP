@@ -13,39 +13,33 @@ const CustomPagination = ({ resPerPage, filteredRoomsCount }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Get current page from URL or default to 1
-  let page = searchParams.get("page") || 1;
-  page = Number(page);
+  // Parse the 'page' query parameter as a number, default to 1 if not present
+  const page = Number(searchParams.get("page")) || 1;
 
-  // Calculate total pages based on filtered room count and results per page
+  // Calculate total pages
   const totalPages = Math.ceil(filteredRoomsCount / resPerPage);
 
-  // Handler for page change
+  // Handle page change
   const handlePerPage = (currentPage: number) => {
     if (typeof window !== "undefined") {
       const queryParams = new URLSearchParams(window.location.search);
-
-      // Set or update the 'page' query parameter
       queryParams.set("page", currentPage.toString());
-
-      // Construct the new path and push it to the router
       const path = `${window.location.pathname}?${queryParams.toString()}`;
       router.push(path);
     }
   };
 
   return (
-    <div>
-      <div className="flex justify-center mt-5">
-        <Pagination
-          isCompact
-          showControls
-          total={totalPages} // Total number of pages
-          color="danger"
-          page={page} // Use current page from URL
-          onChange={handlePerPage} // Handle page change
-        />
-      </div>
+    <div className="flex justify-center mt-5">
+      <Pagination
+        isCompact
+        showControls
+        total={totalPages}
+        color="danger"
+        page={page} // Ensure this is a number
+        onChange={handlePerPage} // Update on page change
+        isDisabled={page === totalPages && totalPages === 1}
+      />
     </div>
   );
 };

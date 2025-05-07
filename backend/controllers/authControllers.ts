@@ -8,6 +8,8 @@ import { delete_file, upload_file } from "../utils/cloudinary";
 import crypto from "crypto";
 import { resetPasswordHTMLTemplate } from "../utils/emailTemplate";
 import sendEmail from "../utils/sendEmail";
+import db from '../config/dbConnect';
+import bcrypt from 'bcryptjs';
 
 // Register user  =>  /api/auth/register
 export const registerUser = catchAsyncErrors(async (req: NextRequest) => {
@@ -127,7 +129,7 @@ export const forgotPassword = catchAsyncErrors(async (req: NextRequest) => {
 
 // Reset password  =>  /api/password/reset/:token
 export const  resetPassword = catchAsyncErrors(
-  async (req: NextRequest, { params }: { params: { token: string } }) => {
+  async (req: NextRequest, { params    }: { params: { token: string } }) => {
     const body = await req.json();
 
     // Hash the token
@@ -225,4 +227,250 @@ export const deleteUser = catchAsyncErrors(
       success: true
     })
   }
-)
+) 
+
+// const pool = db.pool;
+
+// export const registerUser = catchAsyncErrors(async (req: NextRequest) => {
+//   const body = await req.json();
+//   const { name, email, password } = body;
+
+//   const result = await pool.query(
+//     `INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id`,
+//     [name, email, password]
+//   );
+
+//   return NextResponse.json({
+//     success: true,
+//     userId: result.rows[0].id,
+//   });
+// });
+
+// export const updateProfile = catchAsyncErrors(async (req: NextRequest) => {
+//   const body = await req.json();
+//   const { name, email } = body;
+
+//   // Assuming `req.user.id` contains the user’s ID, passed from middleware
+//   const result = await pool.query(
+//     `UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING *`,
+//     [name, email, req.user.id]
+//   );
+
+//   if (result.rows.length === 0) {
+//     throw new ErrorHandler("User not found", 404);
+//   }
+
+//   return NextResponse.json({
+//     success: true,
+//     user: result.rows[0],
+//   });
+// });
+
+// export const updatePassword = catchAsyncErrors(async (req: NextRequest) => {
+//   const body = await req.json();
+//   const { oldPassword, password } = body;
+
+//   // Fetch user with their password (make sure you're handling password securely)
+//   const result = await pool.query(
+//     `SELECT * FROM users WHERE id = $1`,
+//     [req.user.id]
+//   );
+
+//   if (result.rows.length === 0) {
+//     throw new ErrorHandler("User not found", 404);
+//   }
+
+//   const user = result.rows[0];
+
+//   // Compare the provided old password with the stored hashed password
+//   const isMatched = await bcrypt.compare(oldPassword, user.password);
+
+//   if (!isMatched) {
+//     throw new ErrorHandler("Old password is incorrect", 400);
+//   }
+
+//   // Hash the new password before saving it (for security)
+//   const hashedPassword = await bcrypt.hash(password, 10);
+
+//   await pool.query(
+//     `UPDATE users SET password = $1 WHERE id = $2`,
+//     [hashedPassword, req.user.id]
+//   );
+
+//   return NextResponse.json({
+//     success: true,
+//   });
+// });
+
+// export const uploadAvatar = catchAsyncErrors(async (req: NextRequest) => {
+//   const body = await req.json();
+  
+//   const avatarResponse = await upload_file(body?.avatar, "bookit/avatars");
+
+//   // Remove avatar from cloudinary if exists
+//   if (req.user.avatar?.public_id) {
+//     await delete_file(req.user.avatar?.public_id);
+//   }
+
+//   const result = await pool.query(
+//     `UPDATE users SET avatar = $1 WHERE id = $2 RETURNING *`,
+//     [avatarResponse, req.user.id]
+//   );
+
+//   return NextResponse.json({
+//     success: true,
+//     user: result.rows[0],
+//   });
+// });
+
+// export const forgotPassword = catchAsyncErrors(async (req: NextRequest) => {
+//   const body = await req.json();
+//   const { email } = body;
+
+//   const result = await pool.query(
+//     `SELECT * FROM users WHERE email = $1`,
+//     [email]
+//   );
+
+//   if (result.rows.length === 0) {
+//     throw new ErrorHandler("User not found with this email", 404);
+//   }
+
+//   const user = result.rows[0];
+  
+//   // Get reset token and update the user record
+//   const resetToken = user.getResetPasswordToken();
+//   await pool.query(
+//     `UPDATE users SET reset_password_token = $1, reset_password_expire = $2 WHERE id = $3`,
+//     [resetToken, Date.now() + 3600000, user.id] // 1 hour expiration
+//   );
+
+//   // Send email logic, etc.
+//   const resetUrl = `${process.env.API_URL}/password/reset/${resetToken}`;
+//   const message = resetPasswordHTMLTemplate(user.name, resetUrl);
+
+//   try {
+//     await sendEmail({
+//       email: user.email,
+//       subject: "Password Recovery",
+//       message,
+//     });
+//   } catch (error: any) {
+//     throw new ErrorHandler(error?.message, 500);
+//   }
+
+//   return NextResponse.json({
+//     success: true,
+//   });
+// });
+
+// export const resetPassword = catchAsyncErrors(
+//   async (req: NextRequest, { params }: { params: { token: string } }) => {
+//     const body = await req.json();
+
+//     const resetPasswordToken = crypto
+//       .createHash("sha256")
+//       .update(params.token)
+//       .digest("hex");
+
+//     const result = await pool.query(
+//       `SELECT * FROM users WHERE reset_password_token = $1 AND reset_password_expire > $2`,
+//       [resetPasswordToken, Date.now()]
+//     );
+
+//     if (result.rows.length === 0) {
+//       throw new ErrorHandler("Password reset token is invalid or has expired", 404);
+//     }
+
+//     const user = result.rows[0];
+
+//     if (body.password !== body.confirmPassword) {
+//       throw new ErrorHandler("Passwords do not match", 400);
+//     }
+
+//     // Set the new password
+//     await pool.query(
+//       `UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expire = NULL WHERE id = $2`,
+//       [body.password, user.id]
+//     );
+
+//     return NextResponse.json({
+//       success: true,
+//     });
+//   }
+// );
+
+// export const allAdminUsers = catchAsyncErrors(async (req: NextRequest) => {
+//   const result = await pool.query(`SELECT * FROM users`);
+
+//   return NextResponse.json({
+//     users: result.rows,
+//   });
+// });
+
+// export const getUserDetails = catchAsyncErrors(async (req: NextRequest, { params }: { params: { id: string } }) => {
+//   const result = await pool.query(
+//     `SELECT * FROM users WHERE id = $1`,
+//     [params.id]
+//   );
+
+//   if (result.rows.length === 0) {
+//     throw new ErrorHandler("User not found with this ID", 404);
+//   }
+
+//   return NextResponse.json({
+//     user: result.rows[0],
+//   });
+// });
+
+// export const updateUser = catchAsyncErrors(async (req: NextRequest, { params }: { params: { id: string } }) => {
+//   const body = await req.json();
+
+//   const newUserData = {
+//     name: body.name,
+//     email: body.email,
+//     role: body.role,
+//   };
+
+//   const result = await pool.query(
+//     `UPDATE users SET name = $1, email = $2, role = $3 WHERE id = $4 RETURNING *`,
+//     [newUserData.name, newUserData.email, newUserData.role, params.id]
+//   );
+
+//   if (result.rows.length === 0) {
+//     throw new ErrorHandler("User not found", 404);
+//   }
+
+//   return NextResponse.json({
+//     user: result.rows[0],
+//   });
+// });
+
+// export const deleteUser = catchAsyncErrors(
+//   async (req: NextRequest, { params }: { params: { id: string } }) => {
+//     const result = await pool.query(
+//       `SELECT * FROM users WHERE id = $1`,
+//       [params.id]
+//     );
+
+//     if (result.rows.length === 0) {
+//       throw new ErrorHandler("User not found with this ID", 404);
+//     }
+
+//     const user = result.rows[0];
+
+//     // Remove avatar from cloudinary if exists
+//     if (user.avatar?.public_id) {
+//       await delete_file(user.avatar.public_id);
+//     }
+
+//     await pool.query(
+//       `DELETE FROM users WHERE id = $1`,
+//       [params.id]
+//     );
+
+//     return NextResponse.json({
+//       success: true,
+//     });
+//   }
+// );

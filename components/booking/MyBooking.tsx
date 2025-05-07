@@ -1,6 +1,5 @@
 "use client";
 
-import { IBooking } from "@/backend/models/booking";
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -20,20 +19,31 @@ import {
 import { useCancelBookingMutation } from "@/redux/api/bookingApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { IBooking } from "@/backend/models/booking";
+import axios from "axios";
 
-interface Props {
-  data: {
-    bookings: IBooking[];
-  };
-}
-
-const MyBookings = ({ data }: Props) => {
+const MyBookings = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
-  const [bookingList, setBookingList] = useState(data.bookings);
+  const [bookingList, setBookingList] = useState<IBooking[]>([]);
   const router = useRouter();
   const [cancelBooking, { error, isSuccess }] = useCancelBookingMutation();
 
+  // 🔄 Fetch latest bookings from API
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const { data } = await axios.get("/api/bookings/me");
+        setBookingList(data.bookings);
+      } catch (error) {
+        toast.error("Failed to load bookings.");
+      }
+    };
+
+    fetchBookings();
+  }, []);
+
+  // ✅ Handle cancel booking updates
   useEffect(() => {
     if (error && "data" in error) {
       const errorMessage = (error as any)?.data?.errMessage || "An error occurred";
@@ -42,9 +52,6 @@ const MyBookings = ({ data }: Props) => {
 
     if (isSuccess && selectedBookingId) {
       toast.success("Booking canceled successfully");
-
-      // Update the booking list to reflect the cancelled status
-      
       //@ts-ignore
       setBookingList((prevBookings) =>
         prevBookings.map((booking) =>
@@ -54,16 +61,14 @@ const MyBookings = ({ data }: Props) => {
         )
       );
 
-      // Optionally refresh the page or navigate
-      router.refresh();
       onOpenChange();
       setSelectedBookingId(null);
     }
-  }, [error, isSuccess, selectedBookingId, router, onOpenChange]);
+  }, [error, isSuccess, selectedBookingId, onOpenChange]);
 
   const cancelBookingHandler = (id: string) => {
     setSelectedBookingId(id);
-    cancelBooking(id);  // Trigger cancel booking mutation
+    cancelBooking(id);
   };
 
   const setBookings = () => {
@@ -80,6 +85,7 @@ const MyBookings = ({ data }: Props) => {
 
     bookingList.forEach((booking) => {
       const isCancelled = booking.status === "cancelled";
+      const isPending = booking.status === "pending";
       data.rows.push({
         id: booking._id,
         checkin: new Date(booking?.checkInDate).toLocaleString("en-US"),
@@ -90,19 +96,27 @@ const MyBookings = ({ data }: Props) => {
             <Link
               href={`/bookings/${booking._id}`}
               color="secondary"
-              isDisabled={isCancelled}
+              isDisabled={isPending || isCancelled}
             >
               <i className="fa fa-eye"></i>
             </Link>
             <Link
               href={`/bookings/invoice/${booking._id as string}`}
               color="success"
-              isDisabled={isCancelled}
+              isDisabled={isPending || isCancelled}
             >
               <i className="fa fa-receipt"></i>
             </Link>
 
-            {!isCancelled && (
+            {isPending ? (
+              <Button variant="faded" isDisabled>
+                Pending
+              </Button>
+            ) : isCancelled ? (
+              <Button variant="faded" isDisabled>
+                Cancelled
+              </Button>
+            ) : (
               <>
                 <Button onPress={onOpen}>Cancel</Button>
                 <Modal
@@ -135,11 +149,6 @@ const MyBookings = ({ data }: Props) => {
                   </ModalContent>
                 </Modal>
               </>
-            )}
-            {isCancelled && (
-              <Button variant="faded" isDisabled>
-                Cancelled
-              </Button>
             )}
           </div>
         ),

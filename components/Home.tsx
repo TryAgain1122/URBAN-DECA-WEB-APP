@@ -6,7 +6,7 @@ import Link from "next/link";
 import RoomItem from "./rooms/RoomItem";
 import { FaArrowLeft } from "react-icons/fa6";
 import toast from "react-hot-toast";
-import { IRoom } from "@/backend/models/room";
+import { IRoom } from "../types/room"
 import CustomPagination from "./layout/CustomPagination";
 import { useSearchParams } from "next/navigation";
 
@@ -53,7 +53,7 @@ export const HomePage: React.FC<Props> = ({ data }) => {
                 No Rooms
               </div>
             ) : (
-              rooms?.map((room) => <RoomItem room={room} key={room._id as React.Key} />)
+              rooms?.map((room) => <RoomItem room={room} key={room.id as React.Key} />)
             )}
           </div>
         </div>

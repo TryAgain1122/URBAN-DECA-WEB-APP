@@ -91,3 +91,47 @@ userSchema.methods.getResetPasswordToken = function (): string {
 
 export default mongoose.models.User ||
   mongoose.model<IUser>("User", userSchema);
+
+// import { Pool } from 'pg';
+// import db from '../config/dbConnect';
+
+// const pool = db.pool;
+
+// export interface IUser {
+//   id: string;
+//   name: string;
+//   email: string;
+//   password: string;
+//   avatar: any; // You can replace this with a more specific type if needed
+//   role: string;
+//   google_id?: string;
+//   created_at: Date;
+//   reset_password_token?: string;
+//   reset_password_expire?: Date;
+// }
+
+// const createUsersTable = async () => {
+//   const usersQuery = `
+//     CREATE TABLE IF NOT EXISTS users (
+//       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+//       name VARCHAR(255) NOT NULL,
+//       email VARCHAR(255) NOT NULL UNIQUE,
+//       password VARCHAR(255) NOT NULL,
+//       avatar JSONB,
+//       role VARCHAR(50) DEFAULT 'user',
+//       google_id VARCHAR(255) UNIQUE,
+//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//       reset_password_token VARCHAR(255),
+//       reset_password_expire TIMESTAMP
+//     );
+//   `;
+
+//   try {
+//     await pool.query(usersQuery);
+//     console.log("✅ Users table created (or already exists)");
+//   } catch (error) {
+//     console.error("❌ Error creating Users table:", error);
+//   }
+// };
+
+// createUsersTable();

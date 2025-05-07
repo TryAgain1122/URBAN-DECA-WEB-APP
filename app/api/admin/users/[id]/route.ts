@@ -1,3 +1,4 @@
+import dbConnect from "@/backend/config/dbConnect";
 import { deleteUser, getUserDetails, updateUser } from "@/backend/controllers/authControllers";
 import { authorizeRoles, isAuthenticatedUser } from "@/backend/middlewares/auth";
 import { createEdgeRouter } from "next-connect"
@@ -10,6 +11,7 @@ interface RequestContext {
 }
 
 const router = createEdgeRouter<NextRequest, RequestContext>();
+dbConnect();
 
 router.use(isAuthenticatedUser, authorizeRoles("admin"));
 

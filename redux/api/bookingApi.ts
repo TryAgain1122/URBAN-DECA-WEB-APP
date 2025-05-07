@@ -28,7 +28,7 @@ export const bookingApi = createApi({
       },
     }),
 
-    stripeCheckout: builder.query({
+    paypalCheckout: builder.query({
       query({ id, checkoutData }) {
         return {
           url: `/payment/checkout_session/${id}`,
@@ -41,20 +41,6 @@ export const bookingApi = createApi({
         };
       },
     }),
-
-    // paymongoCheckout: builder.query({
-    //   query({ id, checkoutData }) {
-    //     return {
-    //       url: `/payment/paymongo_checkout/${id}`,
-    //       params: {
-    //         checkInDate: checkoutData.checkInDate,
-    //         checkOutDate: checkoutData.checkOutDate,
-    //         daysOfStay: checkoutData.daysOfStay,
-    //         amount: checkoutData.amount,
-    //       },
-    //     };
-    //   },
-    // }),
 
     getSalesStats: builder.query({
       query({ startDate, endDate }) {
@@ -78,8 +64,17 @@ export const bookingApi = createApi({
           method: "PUT"
         }
       }
-    })
-  }),
+    }),
+    updateBookingStatus: builder.mutation({
+      query({ id, status }) {
+        return {
+          url: `/admin/bookings/${id}/status`,
+          method: "PUT",
+          body: { status },
+        }
+      }
+    }),
+  }),  
 });
 
 
@@ -87,9 +82,9 @@ export const {
   useNewBookingMutation,
   useLazyCheckBookingAvailabilityQuery,
   useGetBookedDatesQuery,
-  useLazyStripeCheckoutQuery,
+  useLazyPaypalCheckoutQuery,
   useLazyGetSalesStatsQuery,
   useDeleteBookingMutation,
   useCancelBookingMutation,
-  // useLazyPaymongoCheckoutQuery
+  useUpdateBookingStatusMutation,
 } = bookingApi;

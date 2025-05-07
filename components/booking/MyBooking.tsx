@@ -26,10 +26,11 @@ interface Props {
   data: IBooking[];
 }
 
-const MyBookings: React.FC<Props> = ({ data }) => {
+const MyBookings = ({ data }:Props) => {
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
-  const [bookingList, setBookingList] = useState<IBooking[]>([]);
+  const [bookingList, setBookingList] = useState<IBooking[]>(data);
   const router = useRouter();
   const [cancelBooking, { error, isSuccess }] = useCancelBookingMutation();
 

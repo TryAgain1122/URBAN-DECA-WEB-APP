@@ -22,7 +22,11 @@ import { useRouter } from "next/navigation";
 import { IBooking } from "@/backend/models/booking";
 import axios from "axios";
 
-const MyBookings = () => {
+interface Props {
+  data: IBooking[];
+}
+
+const MyBookings: React.FC<Props> = ({ data }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [bookingList, setBookingList] = useState<IBooking[]>([]);

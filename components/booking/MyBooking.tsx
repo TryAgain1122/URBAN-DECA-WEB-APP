@@ -26,11 +26,10 @@ interface Props {
   data: IBooking[];
 }
 
-const MyBookings = ({ data }:Props) => {
-
+const MyBookings = ({ data }: Props) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
-  const [bookingList, setBookingList] = useState<IBooking[]>(data);
+  const [bookingList, setBookingList] = useState<IBooking[]>([]); // Initialize as an empty array
   const router = useRouter();
   const [cancelBooking, { error, isSuccess }] = useCancelBookingMutation();
 
@@ -59,11 +58,13 @@ const MyBookings = ({ data }:Props) => {
       toast.success("Booking canceled successfully");
       //@ts-ignore
       setBookingList((prevBookings) =>
-        prevBookings.map((booking) =>
-          booking._id === selectedBookingId
-            ? { ...booking, status: "cancelled" }
-            : booking
-        )
+        prevBookings
+          ? prevBookings.map((booking) =>
+              booking._id === selectedBookingId
+                ? { ...booking, status: "cancelled" }
+                : booking
+            )
+          : [] // Return an empty array if prevBookings is null
       );
 
       onOpenChange();
@@ -124,18 +125,12 @@ const MyBookings = ({ data }:Props) => {
             ) : (
               <>
                 <Button onPress={onOpen}>Cancel</Button>
-                <Modal
-                  backdrop="opaque"
-                  isOpen={isOpen}
-                  onOpenChange={onOpenChange}
-                >
+                <Modal backdrop="opaque" isOpen={isOpen} onOpenChange={onOpenChange}>
                   <ModalContent>
                     {(onClose) => (
                       <>
                         <ModalBody>
-                          <h1 className="mt-5">
-                            Are you sure you want to cancel?
-                          </h1>
+                          <h1 className="mt-5">Are you sure you want to cancel?</h1>
                         </ModalBody>
                         <ModalFooter>
                           <Button color="danger" variant="light" onPress={onClose}>

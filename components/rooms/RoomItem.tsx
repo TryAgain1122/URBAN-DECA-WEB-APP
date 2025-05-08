@@ -5,7 +5,7 @@ import {
   Button,
   Link,
 } from "@nextui-org/react";
-import { IRoom } from "@/backend/models/room";
+import { IRoom } from "../../types/room"
 
 interface Props {
   room: IRoom;

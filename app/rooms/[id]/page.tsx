@@ -11,6 +11,7 @@ const getRoom = async (id: string) => {
     next: {
       tags: ["RoomDetails"],
     },
+    cache: 'no-cache'
   });
   return res.json();
 };

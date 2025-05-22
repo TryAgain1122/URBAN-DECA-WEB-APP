@@ -24,44 +24,49 @@ const NewReviews = ({ roomId }: { roomId: string }) => {
 
   const router = useRouter();
 
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
 
-  const { data: { canReview } = {} } = useCanUserReviewQuery(roomId);
+  const { data } = useCanUserReviewQuery(roomId);
+  const canReview = data?.canReview ?? false;
+
   const [postReview, { error, isSuccess }] = usePostReviewMutation();
 
   useEffect(() => {
     if (error && "data" in error) {
       const errorMessage =
-        (error as any)?.data?.errMessage || "An error occurred";
+        (error as any).data?.errMessage || "An error occurred";
       toast.error(errorMessage);
     }
 
     if (isSuccess) {
       toast.success("Review Posted");
       router.refresh();
+      onClose(); // close modal after success
+      setRating(0);
+      setComment("");
     }
-  }, [error, isSuccess]);
+  }, [error, isSuccess, router, onClose]);
 
   const submitHandler = () => {
-    const reviewData = {
-      rating,
-      comment,
-      roomId,
-    };
-    postReview(reviewData);
+    if (rating === 0) {
+      toast.error("Please select a rating before submitting.");
+      return;
+    }
+
+    postReview({ rating, comment, roomId });
   };
 
   return (
     <>
-      {/* {canReview && ( */}
-      <Button onPress={onOpen} color="danger">
-        Submit Your Review
-      </Button>
-      {/* )} */}
+      {canReview && (
+        <Button onPress={onOpen} color="danger">
+          Submit Your Review
+        </Button>
+      )}
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} className="mb-36">
         <ModalContent>
-          {(onClose) => (
+          {(onCloseModal) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
                 Submit Review
@@ -79,7 +84,7 @@ const NewReviews = ({ roomId }: { roomId: string }) => {
                 />
                 <Textarea
                   label="Description"
-                  placeholder="Enter your description"
+                  placeholder="Leave your review"
                   className="w-full"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
@@ -89,7 +94,6 @@ const NewReviews = ({ roomId }: { roomId: string }) => {
               <ModalFooter>
                 <Button
                   color="danger"
-                  onPress={onClose}
                   className="w-full"
                   onClick={submitHandler}
                 >

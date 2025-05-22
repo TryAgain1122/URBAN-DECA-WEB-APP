@@ -77,7 +77,7 @@ const RoomDetails: React.FC<Props> = ({ data }) => {
             <RoomFeature room={room} />
           </div>
           <div className="md:col-span-4">
-            <NewReviews roomId={room?.id}/>
+            <NewReviews roomId={room?._id as string}/>
             <ListReviews reviews={room?.reviews}/>
           </div>
         </div>

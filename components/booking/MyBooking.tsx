@@ -81,6 +81,7 @@ const MyBookings = ({ data }: Props) => {
     const data: { columns: any[]; rows: any[] } = {
       columns: [
         { label: "ID", field: "id" },
+        { label: "Name", field: "name"},
         { label: "Check In", field: "checkin" },
         { label: "Check Out", field: "checkout" },
         { label: "Amount Paid", field: "amountpaid" },
@@ -94,6 +95,7 @@ const MyBookings = ({ data }: Props) => {
       const isPending = booking.status === "pending";
       data.rows.push({
         id: booking._id,
+        name: booking.room?.name || "N/A",
         checkin: new Date(booking?.checkInDate).toLocaleString("en-US"),
         checkout: new Date(booking?.checkOutDate).toLocaleString("en-US"),
         amountpaid: `₱${booking?.amountPaid}`,
@@ -170,6 +172,7 @@ const MyBookings = ({ data }: Props) => {
         {bookingData.rows.map((row, index) => (
           <TableRow key={index}>
             <TableCell>{row.id}</TableCell>
+            <TableCell>{row.name}</TableCell>
             <TableCell>{row.checkin}</TableCell>
             <TableCell>{row.checkout}</TableCell>
             <TableCell>{row.amountpaid}</TableCell>

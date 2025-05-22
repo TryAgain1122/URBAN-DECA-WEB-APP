@@ -99,7 +99,7 @@ import Booking from '../models/booking'
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET_KEY;
-const PAYPAL_API = "https://api-m.sandbox.paypal.com";
+const PAYPAL_API = process.env.PAYPAL_API;
 // const pool = db.pool
 
 // export const paypalCheckoutSession = catchAsyncErrors(

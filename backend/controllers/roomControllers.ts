@@ -232,7 +232,7 @@ export const createRoomReview = catchAsyncErrors(async (req: NextRequest) => {
   const review = {
     user: req.user._id,
     rating: Number(rating),
-    comment,
+    comment, 
   };
 
   const room = await Room.findById(roomId);

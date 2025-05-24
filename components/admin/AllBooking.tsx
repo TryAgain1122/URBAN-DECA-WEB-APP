@@ -193,7 +193,7 @@
             ))}
           </TableBody>
         </Table>
-
+  
         <Modal backdrop="opaque" isOpen={isOpen} onOpenChange={onOpenChange}>
           <ModalContent>
             {(onClose) => (

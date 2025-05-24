@@ -48,9 +48,17 @@ const UploadAvatar = () => {
 
         if (isSuccess) {
             //@ts-ignore
-            updateSession();
-            router.refresh();
-            toast.success("Image Updated")
+            // updateSession();
+            // router.refresh();
+            // toast.success("Image Updated")
+            updateSession().then((res) => {
+              if (res?.data?.user?.avatar?.url) {
+                dispatch(setUser(res.data.user));
+                setAvatar(res.data.user.avatar.url);
+              }
+              router.refresh();
+              toast.success("Image Updated")
+            })
         }
     },[user, error, isSuccess, router, updateSession])
 
@@ -84,7 +92,7 @@ const UploadAvatar = () => {
               alt="nextui logo"
               height={40}
               radius="sm"
-              src={avatarPreview}
+              src={avatarPreview || "/images/default_avatar.jpg"}
               width={40}
             />
             <div className="flex flex-col">

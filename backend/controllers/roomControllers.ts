@@ -115,6 +115,7 @@ export const newRoom = catchAsyncErrors(async (req: NextRequest) => {
 
 
 // Get room details  =>  /api/rooms/:id
+
 export const getRoomDetails = catchAsyncErrors(
   async (req: NextRequest, { params }: { params: { id: string } }) => {
     const room = await Room.findById(params.id).populate("reviews.user");
@@ -288,6 +289,46 @@ export const allAdminRooms = catchAsyncErrors(async (req: NextRequest) => {
       rooms,
   })
 })
+
+//Get room Reviews - ADMIN => /api/admin/room/reviews
+export const getRoomReviews = catchAsyncErrors(async (req: NextRequest) => {
+  const { searchParams } = new URL(req.url);
+
+  const room = await Room.findById(searchParams.get("roomId"));
+
+  return NextResponse.json({
+    reviews: room.reviews,
+  })
+})
+
+//Delete room review - ADMIN => /api/admin/rooms/reviews 
+export const deleteRoomReview = catchAsyncErrors(async (req: NextRequest) => {
+  const { searchParams } = new URL(req.url);
+
+  const roomId = searchParams.get("roomId");
+  const reviewId = searchParams.get("id");
+
+  const room = await Room.findById(roomId);
+
+const reviews = (room.reviews as IReview[]).filter(
+  (review) => review._id.toString() !== reviewId
+);
+  const numOfReviews = reviews.length;
+
+  const ratings =
+    numOfReviews === 0
+      ? 0
+      : room?.reviews?.reduce(
+          (acc: number, item: { rating: number }) => item.rating + acc,
+          0
+        ) / numOfReviews;
+
+  await Room.findByIdAndUpdate(roomId, { reviews, numOfReviews, ratings });
+
+  return NextResponse.json({
+    success: true,
+  });
+});
 
 // import { NextRequest, NextResponse} from 'next/server';
 // import db from '../config/dbConnect';

@@ -7,6 +7,7 @@ export interface IImage extends Document {
 }
 
 export interface IReview extends Document {
+  _id: string;
   user: IUser;
   rating: number;
   comment: string;

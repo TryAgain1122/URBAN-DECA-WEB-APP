@@ -69,7 +69,7 @@ export const updatePassword = catchAsyncErrors(async (req: NextRequest) => {
 export const uploadAvatar = catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
 
-  const avatarResponse = await upload_file(body?.avatar, "bookit/avatars");
+  const avatarResponse = await upload_file(body?.avatar, "urban/avatars");
 
   // Remove avatar from cloudinary
   if (req?.user?.avatar?.public_id) {

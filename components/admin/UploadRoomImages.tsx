@@ -30,7 +30,7 @@ interface Props {
   };
 }
 
-const UploadRoomImages = ({ data }: Props) => {
+const   UploadRoomImages = ({ data }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<string[]>([]);
   const [imagesPreview, setImagesPreview] = useState<string[]>([]);

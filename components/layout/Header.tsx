@@ -77,14 +77,17 @@ export default function Header() {
                   as="button"
                   className="transition-transform"
                   color="danger"
-                  name="Jason Hughes"
+                  name={user?.name || "User"}
                   size="md"
                   src={
-                    data?.user?.image
-                    ? data?.user?.image
-                    : user?.avatar 
-                    ? user?.avatar?.url
-                    :   "/images/default_avatar.jpg"
+                    // data?.user?.image
+                    // ? data?.user?.image
+                    // : user?.avatar 
+                    // ? user?.avatar?.url
+                    // :   "/images/default_avatar.jpg"
+                    user?.avatar?.url || 
+                    data?.user?.image || 
+                    "/images/default_avatar.jpg"
                   }
                 />
               </div>

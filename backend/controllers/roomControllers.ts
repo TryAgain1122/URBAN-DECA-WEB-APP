@@ -134,23 +134,79 @@ export const getRoomDetails = catchAsyncErrors(
 // Update room details  =>  /api/admin/rooms/:id
 export const updateRoom = catchAsyncErrors(
   async (req: NextRequest, { params }: { params: { id: string } }) => {
+    // Find the existing room by ID
     let room = await Room.findById(params.id);
-    const body = await req.json();
-
     if (!room) {
       throw new ErrorHandler("Room not found", 404);
     }
 
+    // Parse the request body
+    const body = await req.json();
+
+    // Check if images are provided and are an array
+    if (body.images && Array.isArray(body.images)) {
+      const imageLinks: { public_id: string; url: string }[] = [];
+
+      // Loop through each image item in the body.images array
+      for (const img of body.images) {
+        if (typeof img === "string" && img.startsWith("data:image")) {
+          // If the image is a base64 string, upload it
+          try {
+            const result = await upload_file(img, "urban/rooms");
+            imageLinks.push({ public_id: result.public_id, url: result.url });
+          } catch (error) {
+            console.error("Image upload failed:", error);
+            throw new ErrorHandler("Failed to upload image.", 500);
+          }
+        } else if (
+          typeof img === "object" &&
+          img.public_id &&
+          img.url
+        ) {
+          // If image is already an uploaded image object, keep it as is
+          imageLinks.push(img);
+        } else {
+          // Optionally handle unexpected image formats (skip or throw error)
+          // For now, ignoring invalid image entries silently
+        }
+      }
+
+      // Replace body.images with the processed list of uploaded images
+      body.images = imageLinks;
+    }
+
+    // Update the room with the processed body data
     room = await Room.findByIdAndUpdate(params.id, body, {
       new: true,
     });
 
+    // Return success response with updated room
     return NextResponse.json({
       success: true,
       room,
     });
   }
 );
+// export const updateRoom = catchAsyncErrors(
+//   async (req: NextRequest, { params }: { params: { id: string } }) => {
+//     let room = await Room.findById(params.id);
+//     const body = await req.json();
+
+//     if (!room) {
+//       throw new ErrorHandler("Room not found", 404);
+//     }
+
+//     room = await Room.findByIdAndUpdate(params.id, body, {
+//       new: true,
+//     });
+
+//     return NextResponse.json({
+//       success: true,
+//       room,
+//     });
+//   }
+// ); 
+
 
 //Upload room images => /api/admin/rooms/:id/upload_images
 export const uploadRoomImages = catchAsyncErrors(

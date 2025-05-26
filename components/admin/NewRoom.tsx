@@ -19,10 +19,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useNewRoomMutation } from "@/redux/api/roomApi";
 import toast from "react-hot-toast";
-import axios from "axios"; // for image upload (you can use other libraries too)
-import { upload_file } from "@/backend/utils/cloudinary";
 
-// Type definition for room details
 interface RoomDetails {
   name: string;
   price: number;
@@ -54,7 +51,7 @@ const NewRoom = () => {
     roomCleaning: false,
   });
 
-  const [images, setImage] = useState<string[]>([]); // Store images as an array of files
+  const [images, setImage] = useState<string[]>([]);
 
   const {
     name,
@@ -89,11 +86,19 @@ const NewRoom = () => {
   const SubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Prepare the room data
+    const formattedDescription = description
+      .split(/\n|\\n/)
+      .map((line) =>
+        line.trim().match(/^[-•]/)
+          ? `\n${line.trim()}`
+          : line.trim()
+      )
+      .join(" ");
+
     const roomData = {
       name,
       pricePerNight: price,
-      description,
+      description: formattedDescription,
       address,
       category,
       guestCapacity: Number(guestCapacity),
@@ -103,9 +108,9 @@ const NewRoom = () => {
       isAirConditioned: airConditioned,
       isPetsAllowed: petsAllowed,
       isRoomCleaning: roomCleaning,
-      images, // This is where you can add image URLs after uploading them
+      images,
     };
-    // Here you should upload images and handle server interaction for the room data
+
     newRoom(roomData);
   };
 
@@ -121,21 +126,22 @@ const NewRoom = () => {
     });
   };
 
-  const onImageChange = async(e: React.ChangeEvent<HTMLInputElement>) => {
+  const onImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const filesArray = Array.from(e.target.files); 
+      const filesArray = Array.from(e.target.files);
 
       const base64Images = await Promise.all(
-        filesArray.map((file) => {
-          return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = (error) => reject(error);
-            reader.readAsDataURL(file);
-          })
-        })
-      )
-      setImage(base64Images); 
+        filesArray.map(
+          (file) =>
+            new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result as string);
+              reader.onerror = (error) => reject(error);
+              reader.readAsDataURL(file);
+            })
+        )
+      );
+      setImage(base64Images);
     }
   };
 
@@ -244,7 +250,6 @@ const NewRoom = () => {
               </Select>
             </div>
 
-            {/* Image Upload */}
             <Input
               type="file"
               label="Room Image"
@@ -252,10 +257,9 @@ const NewRoom = () => {
               onChange={onImageChange}
               className="mb-4"
               accept="image/*"
-              multiple // Allow multiple images
+              multiple
             />
 
-            {/* Room Features */}
             {roomFeatures.map((feature) => (
               <Checkbox
                 key={feature.name}
@@ -295,6 +299,15 @@ const NewRoom = () => {
           </CardFooter>
         </Card>
       </form>
+
+      {/* Description Preview with line breaks */}
+      <div
+        className="mt-6 p-4 border rounded whitespace-pre-line bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+        style={{ whiteSpace: "pre-line" }}
+      >
+        <h3 className="mb-2 font-semibold">Description Preview:</h3>
+        {description || <i>No description yet...</i>}
+      </div>
     </div>
   );
 };

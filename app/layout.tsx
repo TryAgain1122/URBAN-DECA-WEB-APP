@@ -21,21 +21,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-       <head>
+      <head>
         <link
-          rel='stylesheet'
-          href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css'
-          crossOrigin='anonymous'
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+          crossOrigin="anonymous"
         />
       </head>
       <body className={inter.className}>
         <GlobalProvider>
           <Providers>
-
-           
-            <Header/>
+            <Header />
             <div className="block md:hidden absolute top-44 right-6">
-            <ThemeSwitcher/>
+              <ThemeSwitcher />
             </div>
             {children}
             <Footer />

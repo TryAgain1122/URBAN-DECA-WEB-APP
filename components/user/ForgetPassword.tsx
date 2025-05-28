@@ -12,7 +12,7 @@ import {
   Input,
   Button,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useForgotPasswordMutation } from "@/redux/api/authApi";
 import toast from "react-hot-toast";
 

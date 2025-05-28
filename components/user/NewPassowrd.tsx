@@ -12,7 +12,7 @@ import {
   Input,
   Button,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   useResetPasswordMutation,
 } from "@/redux/api/authApi";

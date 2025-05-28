@@ -9,11 +9,11 @@ import {
     Divider,
     Image,
     Input,
-    Link,
     Button,
+    Link,
     Skeleton,
     Spinner,
-  } from "@nextui-org/react";
+  } from "@heroui/react";
 import { useLazyUpdateSessionQuery, useUploadAvatarMutation } from '@/redux/api/userApi';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { useRouter } from 'next/navigation';
@@ -48,12 +48,16 @@ const UploadAvatar = () => {
         }
 
         if (isSuccess) {
-            //@ts-ignore
-            updateSession();
-            router.refresh();
-            toast.success("Image Uploaded")
+            updateSession(undefined).then((res) => {
+                if (res?.data?.user?.avatar?.url) {
+                    dispatch(setUser(res.data.user));
+                    setAvatarPreview(res.data.user.avatar.url);
+                }
+                router.refresh();
+                toast.success("Image Uploaded")
+            });
         }
-    },[user, error, isSuccess])
+    }, [user, error, isSuccess, router, updateSession, dispatch])
 
     const submitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -109,8 +113,7 @@ const UploadAvatar = () => {
                   name='avatar'
                   accept='images/*'
                   id='customFile'
-                  onChange={onChange}
-                  
+                  onChange={onChange}           
                 />
               </>
             )}

@@ -12,7 +12,7 @@ import {
   Input,
   Link,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { MdEmail } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";

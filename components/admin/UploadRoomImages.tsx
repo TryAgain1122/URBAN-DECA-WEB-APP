@@ -21,7 +21,7 @@ import {
   Link,
   Skeleton,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { RiRouterLine } from "react-icons/ri";
 
 interface Props {

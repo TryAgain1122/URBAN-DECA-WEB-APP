@@ -15,7 +15,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useCancelBookingMutation } from "@/redux/api/bookingApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";

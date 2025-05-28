@@ -16,7 +16,7 @@
     useDisclosure,
     Modal,
     Pagination,
-  } from "@nextui-org/react";
+  } from "@heroui/react";
   import toast from "react-hot-toast";
   import { useRouter } from "next/navigation";
   import { useDeleteBookingMutation, useUpdateBookingStatusMutation } from "@/redux/api/bookingApi";

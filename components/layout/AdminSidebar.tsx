@@ -9,7 +9,7 @@ import {
   Divider,
   Link,
   Image,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { FaTachographDigital } from "react-icons/fa6";
 import { LuHotel } from "react-icons/lu";

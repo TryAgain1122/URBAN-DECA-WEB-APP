@@ -15,7 +15,7 @@ import {
   Textarea,
   Checkbox,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useNewRoomMutation } from "@/redux/api/roomApi";
 import toast from "react-hot-toast";

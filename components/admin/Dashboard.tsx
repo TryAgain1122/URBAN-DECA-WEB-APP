@@ -6,10 +6,9 @@ import DateRangePicker from "react-datepicker";
 import SalesStats from "./SalesStats";
 import { TopPerformingChart } from "../charts/TopPerformingChart";
 import "react-datepicker/dist/react-datepicker.css";
-import { Button } from "@nextui-org/button";
 import toast from "react-hot-toast";
 import { SalesCharts } from "../charts/SalesCharts";
-import { Card, CardHeader, CardBody, Image, Spinner } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Image, Spinner, Button } from "@heroui/react";
 
 const Dashboard = () => {
   const [startDate, setStartDate] = useState(new Date());

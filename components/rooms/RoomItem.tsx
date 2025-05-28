@@ -4,7 +4,7 @@ import {
   Image,
   Button,
   Link,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { IRoom } from "../../types/room"
 
 interface Props {

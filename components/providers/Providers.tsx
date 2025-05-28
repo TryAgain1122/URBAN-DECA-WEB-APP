@@ -1,6 +1,6 @@
 'use client'
 
-import {NextUIProvider} from "@nextui-org/react";
+import {HeroUIProvider} from "@heroui/react";
 import {ThemeProvider as NextThemesProvider} from "next-themes";
 
 interface PropsProvider {
@@ -9,11 +9,11 @@ interface PropsProvider {
 
 const Providers: React.FC<PropsProvider> = ({ children }) => {
   return (
-    <NextUIProvider>
+    <HeroUIProvider>
         <NextThemesProvider attribute="class" defaultTheme="darkmode">
             {children}
         </NextThemesProvider>
-    </NextUIProvider>
+    </HeroUIProvider>
   )
 }
 

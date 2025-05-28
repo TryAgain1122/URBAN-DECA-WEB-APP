@@ -9,7 +9,7 @@ import {
   Button,
   useDisclosure,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import StarRatings from "react-star-ratings";
 import { useRouter } from "next/navigation";
 import {

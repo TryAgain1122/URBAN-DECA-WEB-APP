@@ -11,7 +11,7 @@ import {
   Button,
   Input,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { IUser } from "@/backend/models/user";
 import { useRouter } from "next/navigation";
 import { useUpdateUserMutation } from "@/redux/api/userApi";

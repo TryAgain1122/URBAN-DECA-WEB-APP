@@ -10,7 +10,7 @@ import {
   Input,
   Button,
   Link,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useRegisterMutation } from "@/redux/api/authApi";
 import toast from "react-hot-toast";

@@ -58,7 +58,7 @@ async function auth(req: NextRequest, res: any) {
         // Update session when user is updated
         if (req.url?.includes("/api/auth/session?update")) {
           // Hit the database and return the updated user
-          const updatedUser = await User.findById(jwtToken?.user?.id);
+          const updatedUser = await User.findById(jwtToken?.user?._id);
           token.user = updatedUser;
         }
 

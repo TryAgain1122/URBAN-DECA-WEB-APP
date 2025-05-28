@@ -174,7 +174,7 @@ import {
   ModalFooter,
   ModalHeader,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { IRoom } from "@/backend/models/room";
 import DateRangePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

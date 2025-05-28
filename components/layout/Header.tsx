@@ -1,20 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Skeleton } from "@nextui-org/react";
-
 import {
+  Avatar,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Link,
   Navbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  Link,
-  DropdownItem,
-  DropdownTrigger,
-  Dropdown,
-  DropdownMenu,
-  Avatar,
-} from "@nextui-org/react";
+  Skeleton,
+} from "@heroui/react";
+
 import Image from "next/image";
 
 import { signOut, useSession } from "next-auth/react";
@@ -22,6 +22,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { setIsAuthenticated, setUser } from "@/redux/features/userSlice";
 import LoginModal from "../auth/LoginModal";
 import ThemeSwitcher from "../ThemeSwitcher";
+import AvatarDropdown from "../AvatarDropdown";
 
 export default function Header() {
   const { data, status } = useSession();
@@ -61,9 +62,9 @@ export default function Header() {
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
           {/* <DropDown /> */}
-          <ThemeSwitcher />
+          {/* <ThemeSwitcher /> */}
         </NavbarItem>
-
+        {/* <AvatarDropdown /> */}
       </NavbarContent>
 
       {data?.user ? (
@@ -80,33 +81,38 @@ export default function Header() {
                   name={user?.name || "User"}
                   size="md"
                   src={
-                    // data?.user?.image
-                    // ? data?.user?.image
-                    // : user?.avatar 
-                    // ? user?.avatar?.url
-                    // :   "/images/default_avatar.jpg"
-                    user?.avatar?.url || 
-                    data?.user?.image || 
-                    "/images/default_avatar.jpg"
+                    data?.user?.image
+                      ? data?.user?.image
+                      : user?.avatar
+                      ? user?.avatar?.url
+                      : "/images/default_avatar.jpg"
                   }
                 />
               </div>
             </DropdownTrigger>
-            <DropdownMenu aria-label="Profile Actions" color="danger" variant="flat">
+            <DropdownMenu
+              aria-label="Profile Actions"
+              color="danger"
+              variant="flat"
+            >
               <DropdownItem key="profile" className="h-14 gap-2">
                 <p className="font-semibold">Signed in as</p>
                 <p className="font-semibold">{data?.user?.email}</p>
               </DropdownItem>
               <DropdownItem key="dashboard">
                 {user?.role === "admin" && (
-                  <Link href="/admin/dashboard">Dashboard</Link>
+                  <Link color="danger" href="/admin/dashboard">Dashboard</Link>
                 )}
               </DropdownItem>
-              <DropdownItem key="bookings" href="/bookings/me">
-                My Bookings
+              <DropdownItem key="bookings">
+                <Link color="foreground" href="/bookings/me" className="w-full h-full block">
+                  My Bookings
+                </Link>
               </DropdownItem>
-              <DropdownItem key="profile" href="/me/update">
-                Profile
+              <DropdownItem key="profile">
+                <Link color="foreground" href="/me/update" className="w-full h-full block">
+                  Profile
+                </Link>
               </DropdownItem>
               <DropdownItem key="logout" color="danger">
                 <button

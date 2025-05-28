@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link } from "@nextui-org/react";
+import { Link } from "@heroui/react";
 import { FaUser, FaUserCircle, FaLock } from "react-icons/fa"; import { usePathname } from "next/navigation";
 import { IoMdMenu } from "react-icons/io";
 import { IoClose } from "react-icons/io5";

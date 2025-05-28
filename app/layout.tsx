@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { GlobalProvider } from "./GlobalProvider";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import Header2 from "@/components/layout/Header2";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,7 +32,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <GlobalProvider>
           <Providers>
-            <Header />
+            {/* <Header /> */}
+            <Header2 />
             <div className="block md:hidden absolute top-44 right-6">
               <ThemeSwitcher />
             </div>

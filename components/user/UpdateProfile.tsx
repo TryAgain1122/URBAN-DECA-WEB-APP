@@ -18,11 +18,10 @@ import {
   Link,
   Skeleton,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { RiRouterLine } from "react-icons/ri";
 
 const UpdateProfile = () => {
   const [name, setName] = useState("");

@@ -1,6 +1,6 @@
 "use client"; // if you're using App Router
 import { useRouter } from "next/navigation"; // or next/router for Pages Router
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { FaCheckCircle } from "react-icons/fa";
 
 const ConfirmationPage = () => {

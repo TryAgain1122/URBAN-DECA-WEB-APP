@@ -1,6 +1,6 @@
 import { addCommasToAmount } from "@/helpers/helpers";
 import React from "react";
-import { Card, CardHeader, CardBody, Image } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Image } from "@heroui/react";
 
 interface Props {
   data: {

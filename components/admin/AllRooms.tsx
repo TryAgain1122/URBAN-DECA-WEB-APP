@@ -19,7 +19,7 @@ import {
   ModalFooter,
   useDisclosure,
   Pagination,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { IRoom } from "@/backend/models/room";
 import { useRouter } from "next/navigation";
 import { useDeleteRoomMutation } from "@/redux/api/roomApi";

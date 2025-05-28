@@ -6,7 +6,7 @@ import {
   useDeleteReviewMutation,
   useLazyGetRoomReviewsQuery,
 } from "@/redux/api/roomApi";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import {
   Modal,
   ModalBody,
@@ -23,7 +23,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
+} from "@heroui/table";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";

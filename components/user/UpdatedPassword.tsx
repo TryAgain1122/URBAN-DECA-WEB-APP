@@ -13,7 +13,7 @@ import {
   Link,
   Skeleton,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useUpdatePasswordMutation } from "@/redux/api/userApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";

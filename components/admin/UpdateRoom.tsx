@@ -667,7 +667,7 @@ import {
   Button,
   Textarea,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { IRoom } from "@/backend/models/room";
 import { useRouter } from "next/navigation";
 import { useUpdateRoomMutation } from "@/redux/api/roomApi";

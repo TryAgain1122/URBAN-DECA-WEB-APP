@@ -215,7 +215,7 @@ const NewRoom = () => {
                 name="category"
               >
                 {["King", "Single", "Twins"].map((bed) => (
-                  <SelectItem key={bed} value={bed}>
+                  <SelectItem key={bed}>
                     {bed}
                   </SelectItem>
                 ))}
@@ -229,7 +229,7 @@ const NewRoom = () => {
                 name="guestCapacity"
               >
                 {["1", "2", "3", "4", "5", "6"].map((num) => (
-                  <SelectItem color="danger" key={num} value={num}>
+                  <SelectItem color="danger" key={num}>
                     {num}
                   </SelectItem>
                 ))}
@@ -243,7 +243,7 @@ const NewRoom = () => {
                 name="numOfBeds"
               >
                 {["1", "2", "3"].map((num) => (
-                  <SelectItem key={num} value={num}>
+                  <SelectItem key={num}>
                     {num}
                   </SelectItem>
                 ))}

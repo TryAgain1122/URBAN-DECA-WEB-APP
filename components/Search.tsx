@@ -70,7 +70,7 @@ const Search = () => {
             onChange={(e) => setFormData({ ...formData, guests: e.target.value })}
           >
             {["1", "2", "3", "4", "5", "6"].map((num) => (
-              <SelectItem key={num} value={num}>
+              <SelectItem key={num}>
                 {num}
               </SelectItem>
             ))}
@@ -83,7 +83,7 @@ const Search = () => {
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
           >
             {["King", "Single", "Twins"].map((bed) => (
-              <SelectItem key={bed} value={bed}>
+              <SelectItem key={bed}>
                 {bed}
               </SelectItem>
             ))}

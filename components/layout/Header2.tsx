@@ -113,8 +113,8 @@ const Header2 = () => {
               <div className="py-1">
                 {user?.role === "admin" && (
                   <Link
-                    href="/dashboard"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    href="/admin/dashboard"
+                    className="block px-4 py-2 text-sm font-bold text-[#F31260] hover:bg-gray-100"
                   >
                     Dashboard
                   </Link>

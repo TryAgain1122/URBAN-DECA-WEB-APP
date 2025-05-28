@@ -138,7 +138,7 @@ const LoginModal = () => {
                     Close
                   </Button>
                   <Button color="danger" type="submit" disabled={loading}>
-                    { loading ? <Spinner color="danger"/> : "Login" }
+                    { loading ? <Spinner color="default"/> : "Login" }
                   </Button>
                 </ModalFooter>
               </form>

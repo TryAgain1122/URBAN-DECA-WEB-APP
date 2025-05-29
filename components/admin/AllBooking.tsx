@@ -57,10 +57,13 @@
       }
     }, [error, isSuccess, router]);
 
+    console.log("Bookings data", bookings)
+
     const setBookings = () => {
       const data: { columns: any[]; rows: any[] } = {
         columns: [
           { label: "ID", field: "id" },
+          { label: "Room", field: "room" },
           { label: "Check In", field: "checkin" },
           { label: "Check Out", field: "checkout" },
           { label: "Amount Paid", field: "amountpaid" },
@@ -73,6 +76,7 @@
       bookings?.forEach((booking) => {
         data?.rows.push({
           id: booking._id,
+          room: booking.room?.name,
           checkin: new Date(booking?.checkInDate).toLocaleString("en-US"),
           checkout: new Date(booking?.checkOutDate).toLocaleString("en-US"),
           amountpaid: `₱${booking?.amountPaid}`,
@@ -184,6 +188,7 @@
             {currentRows.map((row, index) => (
               <TableRow key={index}>
                 <TableCell>{row.id}</TableCell>
+                <TableCell>{row.room || "N/A"}</TableCell>
                 <TableCell>{row.checkin}</TableCell>
                 <TableCell>{row.checkout}</TableCell>
                 <TableCell>{row.amountpaid}</TableCell>

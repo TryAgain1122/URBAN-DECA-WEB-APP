@@ -215,7 +215,7 @@ const NewRoom = () => {
                 name="category"
               >
                 {["King", "Single", "Twins"].map((bed) => (
-                  <SelectItem key={bed}>
+                  <SelectItem color="danger" key={bed}>
                     {bed}
                   </SelectItem>
                 ))}
@@ -243,7 +243,7 @@ const NewRoom = () => {
                 name="numOfBeds"
               >
                 {["1", "2", "3"].map((num) => (
-                  <SelectItem key={num}>
+                  <SelectItem color="danger" key={num}>
                     {num}
                   </SelectItem>
                 ))}
@@ -293,8 +293,8 @@ const NewRoom = () => {
             />
           </CardBody>
           <CardFooter className="w-full">
-            <Button variant="faded" color="danger" type="submit" disabled={isLoading}>
-              {isLoading ? <Spinner size="sm" /> : "Create Room"}
+            <Button color="danger" type="submit" disabled={isLoading}>
+              {isLoading ? <Spinner color="default" size="sm" /> : "Create Room"}
             </Button>
           </CardFooter>
         </Card>

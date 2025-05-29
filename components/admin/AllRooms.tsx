@@ -69,7 +69,6 @@ const AllRooms = ({ data }: Props) => {
       data?.rows.push({
         id: room._id,
         name: room.name,
-
         actions: (
           <div className="flex gap-3">
             <Button
@@ -175,9 +174,9 @@ const AllRooms = ({ data }: Props) => {
               <h1 className="mt-5">Are you sure you want to delete?</h1>
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>No</Button>
+              <Button color="default" variant="light" onPress={onClose}>No</Button>
               <Button
-                color="secondary"
+                color="danger"
                 onPress={() => {
                   onClose();
                   deleteRoomHandler();

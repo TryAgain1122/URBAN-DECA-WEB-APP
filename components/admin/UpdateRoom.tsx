@@ -1009,12 +1009,11 @@ const UpdateRoom = ({ data }: Props) => {
           <Divider />
           <CardFooter className="flex justify-end">
             <Button
-              color="secondary"
-              variant="faded"
+              color="danger"
               type="submit"
               isDisabled={isLoading}
             >
-              {isLoading ? <Spinner color="danger" size="sm" /> : "Update"}
+              {isLoading ? <Spinner color="default" size="sm" /> : "Update"}
             </Button>
           </CardFooter>
         </Card>

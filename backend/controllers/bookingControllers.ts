@@ -351,7 +351,7 @@ export const getSalesStats = catchAsyncErrors(async (req: NextRequest) => {
 
 //Get admin Bookings  => api/admin/bookings
 export const allAdminBookings = catchAsyncErrors(async (req: NextRequest) => {
-  const bookings = await Booking.find().sort({ createdAt: -1 });
+  const bookings = await Booking.find().sort({ createdAt: -1 }).populate("room");
 
   return NextResponse.json({
     bookings,

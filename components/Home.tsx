@@ -12,7 +12,7 @@ interface Props {
   data: {
     success: boolean;
     resPerPage: number;
-    filteredRoomCount: number;
+    filteredRoomsCount: number;
     rooms: IRoom[];
   };
 }
@@ -21,7 +21,7 @@ export const HomePage: React.FC<Props> = ({ data }) => {
   const searchParams = useSearchParams();
   const location = searchParams.get("name")
 
-  const { rooms, resPerPage, filteredRoomCount } = data;
+  const { rooms, resPerPage, filteredRoomsCount } = data;
 
   return (
     <div>
@@ -57,7 +57,7 @@ export const HomePage: React.FC<Props> = ({ data }) => {
         </div>
 
         <CustomPagination 
-          filteredRoomsCount={filteredRoomCount}
+          filteredRoomsCount={filteredRoomsCount}
           resPerPage={resPerPage}
         />
       </Container>

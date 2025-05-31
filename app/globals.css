@@ -21,10 +21,4 @@
     color: #e61e4d;
   }
 
-  .custom-datepicker {
-    width: 100%; /* Ensure full width inside the card */
-    max-width: 350px; /* Set a reasonable max width */
-    margin: 0 auto; /* Center the calendar */
-    
-  }
-  
+

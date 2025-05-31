@@ -64,7 +64,7 @@ const RoomDetails: React.FC<Props> = ({ data }) => {
               )}
             </div>
           </div>
-          <div className="md:col-span-4 flex items-center justify-end">
+          <div className="md:col-span-4 flex justify-end">
             <DatePicker room={room} />
           </div>
         </div>

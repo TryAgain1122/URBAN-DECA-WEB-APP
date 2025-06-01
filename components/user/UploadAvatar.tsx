@@ -111,7 +111,7 @@ const UploadAvatar = () => {
                   type="file"
                   label="Upload Image"
                   name='avatar'
-                  accept='images/*'
+                  accept='image/*'
                   id='customFile'
                   onChange={onChange}           
                 />

@@ -711,7 +711,7 @@ const UpdateRoom = ({ data }: Props) => {
     address: room?.address || "",
     category: room?.category || "",
     guest_capacity: room?.guest_capacity || 1,
-    num_of_beds: room?.num_of_Beds || 1,
+    num_of_beds: room?.num_of_beds || 1,
     is_internet: room?.is_internet || false,
     breakfast: room?.is_breakfast || false,
     is_air_conditioned: room?.is_air_conditioned || false,

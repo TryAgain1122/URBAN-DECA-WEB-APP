@@ -21,7 +21,7 @@ const RoomFeature: React.FC<Props> = ({ room }) => {
 
         <div className='flex flex-row gap-1 items-center mt-5'>
             <FaBed size={30}/>
-            <p>{room?.num_of_beds} Beds</p>
+            <p>{room?.num_of_Beds} Beds</p>
         </div>
 
         <div className='room-feature flex flex-row items-center gap-2 mt-5'>

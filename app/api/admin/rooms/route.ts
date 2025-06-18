@@ -1,4 +1,4 @@
-import dbConnect from "@/backend/config/dbConnect";
+import dbConnect, { connectToPostgres } from "@/backend/config/dbConnect";
 import { allAdminRooms, newRoom } from "@/backend/controllers/roomControllers";
 import {
   authorizeRoles,
@@ -11,7 +11,7 @@ interface RequestContext {}
 
 const router = createEdgeRouter<NextRequest, RequestContext>();
 
-dbConnect();
+connectToPostgres();
 
 router.use(isAuthenticatedUser, authorizeRoles("admin")).get(allAdminRooms);
 router.use(isAuthenticatedUser, authorizeRoles("admin")).post(newRoom);

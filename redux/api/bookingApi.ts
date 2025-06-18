@@ -14,16 +14,16 @@ export const bookingApi = createApi({
       },
     }),
     checkBookingAvailability: builder.query({
-      query({ id, checkInDate, checkOutDate }) {
+      query({ room_id, checkInDate, checkOutDate }) {
         return {
-          url: `/bookings/check_room_availability?roomId=${id}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`,
+          url: `/bookings/check_room_availability?room_id=${room_id}&check_in_date=${checkInDate}&check_out_date=${checkOutDate}`,
         };
       },
     }),
     getBookedDates: builder.query({
       query(id) {
         return {
-          url: `/bookings/booked_dates?roomId=${id}`,
+          url: `/bookings/booked_dates?room_id=${id}`,
         };
       },
     }),
@@ -33,9 +33,9 @@ export const bookingApi = createApi({
         return {
           url: `/payment/checkout_session/${id}`,
           params: {
-            checkInDate: checkoutData.checkInDate,
-            checkOutDate: checkoutData.checkOutDate,
-            daysOfStay: checkoutData.daysOfStay,
+            check_in_date: checkoutData.check_out_date,
+            check_out_date: checkoutData.check_out_date,
+            days_of_stay: checkoutData.days_of_stay,
             amount: checkoutData.amount,
           },
         };
@@ -61,9 +61,9 @@ export const bookingApi = createApi({
       query(id) {
         return {
           url: `/bookings/${id}/cancel_booking`,
-          method: "PUT"
-        }
-      }
+          method: "PUT",
+        };
+      },
     }),
     updateBookingStatus: builder.mutation({
       query({ id, status }) {
@@ -71,12 +71,23 @@ export const bookingApi = createApi({
           url: `/admin/bookings/${id}/status`,
           method: "PUT",
           body: { status },
-        }
-      }
+        };
+      },
     }),
-  }),  
-});
 
+    getAdminNotifications: builder.query({
+      query: () => ({
+        url: "/admin/notifications"
+      })
+    }),
+
+    getUserNotifications: builder.query({
+      query: () => ({
+        url: "/bookings/notifications"
+      })
+    })
+  }),
+});
 
 export const {
   useNewBookingMutation,
@@ -87,4 +98,6 @@ export const {
   useDeleteBookingMutation,
   useCancelBookingMutation,
   useUpdateBookingStatusMutation,
+  useGetAdminNotificationsQuery,
+  useGetUserNotificationsQuery,
 } = bookingApi;

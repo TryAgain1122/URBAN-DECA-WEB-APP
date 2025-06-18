@@ -1,6 +1,6 @@
 "use client";
 
-import { IBooking } from "@/backend/models/booking";
+// import { IBooking } from "@/backend/models/booking";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -20,10 +20,11 @@ import {
   useDisclosure,
   Pagination,
 } from "@heroui/react";
-import { IRoom } from "@/backend/models/room";
+// import { IRoom } from "@/backend/models/room";
 import { useRouter } from "next/navigation";
 import { useDeleteRoomMutation } from "@/redux/api/roomApi";
 import toast from "react-hot-toast";
+import { IRoom } from "@/types/room";
 
 interface Props {
   data: {
@@ -67,14 +68,16 @@ const AllRooms = ({ data }: Props) => {
 
     rooms?.forEach((room) => {
       data?.rows.push({
-        id: room._id,
+        // id: room._id,
+        id: room.id,
         name: room.name,
         actions: (
           <div className="flex gap-3">
             <Button
               as={Link}
               color="primary"
-              href={`/admin/rooms/${room._id} `}
+              // href={`/admin/rooms/${room._id} `}
+              href={`/admin/rooms/${room.id} `}
               isIconOnly
             >
               {" "}
@@ -82,7 +85,8 @@ const AllRooms = ({ data }: Props) => {
             </Button>
             <Button
               color="success"
-              href={`/admin/rooms/${room._id}/upload_images`}
+              // href={`/admin/rooms/${room._id}/upload_images`}
+              href={`/admin/rooms/${room.id}/upload_images`}
               isIconOnly
               as={Link}
             >
@@ -92,7 +96,8 @@ const AllRooms = ({ data }: Props) => {
             <Button
               isIconOnly
               onPress={() => {
-                setRoomIdToDelete(room._id as string);
+                // setRoomIdToDelete(room._id as string);
+                setRoomIdToDelete(room.id as string);
                 onOpen();
               }}
               color="danger"

@@ -1,6 +1,6 @@
 "use client";
 
-import { IReview } from "@/backend/models/room";
+// import { IReview } from "@/backend/models/room";
 import { revalidateTag } from "@/helpers/revalidate";
 import {
   useDeleteReviewMutation,
@@ -27,6 +27,8 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { IReview } from "@/types/room";
+import { Spinner } from "@heroui/spinner";
 
 const RoomReviews = () => {
   const [roomId, setRoomId] = useState("");
@@ -37,19 +39,29 @@ const RoomReviews = () => {
   const [getRoomReviews, { data, error }] = useLazyGetRoomReviewsQuery();
   const [deleteReview, { isSuccess, isLoading }] = useDeleteReviewMutation();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [loading, setLoading] = useState(false);
 
   const reviews = data?.reviews || [];
 
-  const getRoomReviewsHandler = () => {
+  const getRoomReviewsHandler = async () => {
     if (!roomId) {
       toast.error("Room ID is required");
       return;
     }
-    getRoomReviews(roomId);
+
+    try {
+      setLoading(true);
+      await getRoomReviews(roomId);
+    } catch (error) {
+      toast.error("Failed to fetch reviews");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const deleteReviewHandler = (id: string) => {
     deleteReview({ id, roomId });
+    toast.success("Review deleted successfully")
   };
 
   const openDeleteModal = (id: string) => {
@@ -81,8 +93,13 @@ const RoomReviews = () => {
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
           />
-          <Button color="danger" fullWidth onClick={getRoomReviewsHandler}>
-            Fetch Reviews
+          <Button
+            color="danger"
+            disabled={loading}
+            fullWidth
+            onClick={getRoomReviewsHandler}
+          >
+            {loading ? <Spinner color="default" /> : "Fetch Reviews"}
           </Button>
         </div>
       </div>
@@ -97,15 +114,15 @@ const RoomReviews = () => {
           </TableHeader>
           <TableBody>
             {reviews.map((review: IReview) => (
-              <TableRow key={review._id?.toString()}>
-                <TableCell>{review._id?.toString()}</TableCell>
+              <TableRow key={review.id?.toString()}>
+                <TableCell>{review.id?.toString()}</TableCell>
                 <TableCell>{review.rating}</TableCell>
                 <TableCell>{review.comment}</TableCell>
                 <TableCell>
                   <Button
                     isIconOnly
                     color="danger"
-                    onPress={() => openDeleteModal(review._id?.toString())}
+                    onPress={() => openDeleteModal(review.id?.toString())}
                   >
                     <i className="fa fa-trash" />
                   </Button>

@@ -1,11 +1,11 @@
 "use client";
 
-import { IBooking } from "@/backend/models/booking";
 import React from "react";
 
 import "./Invoice.css";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { IBooking } from "@/types/booking";
 
 interface Props {
   data: {
@@ -25,7 +25,7 @@ const Invoice = ({ data }: Props) => {
         const pdf = new jsPDF();
         const pdfWidth = pdf.internal.pageSize.getWidth();
         pdf.addImage(imgData, 0, 0, pdfWidth, 0);
-        pdf.save(`invoice_${booking?._id}.pdf`);
+        pdf.save(`invoice_${booking?.id}.pdf`);
       });
     }
   };
@@ -44,7 +44,7 @@ const Invoice = ({ data }: Props) => {
               <div id="logo" className="my-4">
                 <img src="/images/logo.png" />
               </div>
-              <h1>INVOICE # {booking?._id as string}</h1>
+              <h1>Transaction ID # {booking?.id as string}</h1>
               <div id="company" className="clearfix">
                 <div>Urban Deca Tower</div>
                 <div>
@@ -66,11 +66,11 @@ const Invoice = ({ data }: Props) => {
                 </div>
                 <div>
                   <span>DATE</span>{" "}
-                  {new Date(booking?.createdAt).toLocaleString("en-US")}
+                  {new Date(booking?.created_at).toLocaleString("en-US")}
                 </div>
                 <div>
                   <span>Status</span>{" "}
-                  {booking?.paymentInfo?.status?.toUpperCase()}
+                  {booking?.payment_info?.status?.toUpperCase()}
                 </div>
               </div>
             </header>
@@ -88,20 +88,20 @@ const Invoice = ({ data }: Props) => {
                 <tbody>
                   <tr>
                     <td className="service">{booking?.room?.name}</td>
-                    <td className="desc">₱{booking?.room?.pricePerNight}</td>
+                    <td className="desc">₱{booking?.room?.price_per_night}</td>
                     <td className="unit">
-                      {new Date(booking?.checkInDate).toLocaleString("en-PH")}
+                      {new Date(booking?.check_in_date).toLocaleString("en-PH")}
                     </td>
                     <td className="qty">
-                      {new Date(booking?.checkOutDate).toLocaleString("en-PH")}
+                      {new Date(booking?.check_out_date).toLocaleString("en-PH")}
                     </td>
-                    <td className="qty">{booking?.daysOfStay}</td>
+                    <td className="qty">{booking?.days_of_stay}</td>
                   </tr>
                   <tr>
                     <td colSpan={4} className="grand total">
                       <b>GRAND TOTAL</b>
                     </td>
-                    <td className="grand total">₱{booking?.amountPaid}</td>
+                    <td className="grand total">₱{booking?.amount_paid}</td>
                   </tr>
                 </tbody>
               </table>

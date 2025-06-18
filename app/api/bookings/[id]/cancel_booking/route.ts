@@ -1,4 +1,4 @@
-import dbConnect from "@/backend/config/dbConnect";
+import dbConnect, { connectToPostgres } from "@/backend/config/dbConnect";
 import { cancelBooking, getBookingDetails } from "@/backend/controllers/bookingControllers";
 import { isAuthenticatedUser } from "@/backend/middlewares/auth";
 import { createEdgeRouter } from "next-connect";
@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface RequestContext {}
 
 const router = createEdgeRouter<NextRequest, RequestContext>()
-dbConnect();
+connectToPostgres();
 
 router.use(isAuthenticatedUser);
 router.get(getBookingDetails);

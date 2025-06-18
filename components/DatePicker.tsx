@@ -175,7 +175,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/react";
-import { IRoom } from "@/backend/models/room";
+// import { IRoom } from "@/backend/models/room";
 import DateRangePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { calculateDaysOfStay } from "@/helpers/helpers";
@@ -188,28 +188,44 @@ import {
 } from "@/redux/api/bookingApi";
 import toast from "react-hot-toast";
 import PaypalButton from "./PaypalButton";
+import { IRoom } from "@/types/room";
 
 interface Props {
   room: IRoom;
 }
 
 const DatePicker: React.FC<Props> = ({ room }) => {
-  const [checkInDate, setCheckInDate] = useState<Date | null>(new Date());
-  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
-  const [daysOfStay, setDaysOfStay] = useState(0);
+  const [check_in_date, setCheckInDate] = useState<Date | null>(new Date());
+  const [check_out_date, setCheckOutDate] = useState<Date | null>(null);
+  const [days_of_stay, setDaysOfStay] = useState(0);
   const [isPaypalVisible, setIsPaypalVisible] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const router = useRouter();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
-  const [checkBookingAvailability, { data }] =
+  const [checkBookingAvailability, { data, error, isError }] =
     useLazyCheckBookingAvailabilityQuery();
   const [newBooking] = useNewBookingMutation();
 
+  useEffect(() => {
+  if (isError && (error as any)?.data?.errMessage) {
+    const errorMessage =
+      (error as any).data.errMessage || "An error occurred";
+    toast.error(errorMessage);
+    console.error("API Error:", error);
+  } else if (isError) {
+    toast.error("An unexpected error occurred while checking availability.");
+    console.error("API Error (no message):", error);
+  }
+}, [isError, error]);
+
+
   const isAvailable = data?.isAvailable;
 
-  const { data: { bookedDates: dates } = {} } = useGetBookedDatesQuery(room._id);
+  // const { data: { bookedDates: dates } = {} } = useGetBookedDatesQuery(room._id);
+
+  const { data: { bookedDates: dates } = {} } = useGetBookedDatesQuery(room.id);
   const excludeDates = dates?.map((date: string) => new Date(date)) || [];
 
   const onChange = (dates: [Date | null, Date | null]) => {
@@ -222,7 +238,8 @@ const DatePicker: React.FC<Props> = ({ room }) => {
       setDaysOfStay(days);
 
       checkBookingAvailability({
-        id: room._id,
+        // id: room._id,
+        room_id: room.id,
         checkInDate: checkInDate.toISOString(),
         checkOutDate: checkOutDate.toISOString(),
       });
@@ -230,19 +247,22 @@ const DatePicker: React.FC<Props> = ({ room }) => {
   };
 
   const handlePaymentSuccess = async (details: any) => {
-    if (!checkInDate || !checkOutDate) return;
+    if (!check_in_date || !check_out_date) return;
 
     const bookingData = {
-      room: room._id,
-      checkInDate: checkInDate.toISOString(),
-      checkOutDate: checkOutDate.toISOString(),
-      daysOfStay,
-      amountPaid: totalAmount,
-      paymentInfo: {
+      // room: room._id,
+      room_id: room.id,
+      check_in_date: check_in_date.toISOString(),
+      check_out_date: check_out_date.toISOString(),
+      days_of_stay,
+      amount_paid: totalAmount,
+      payment_info: {
         id: details.id,
         status: details.status === "COMPLETED" ? "paid" : details.status,
-      },
+      },   
     };
+
+    console.log("Booking data to send: ", bookingData)
     try {
       await newBooking(bookingData).unwrap();
       toast.success(`Payment successful! Transaction ID: ${details.id}`);
@@ -253,7 +273,8 @@ const DatePicker: React.FC<Props> = ({ room }) => {
     }
   };
 
-  const totalAmount = room.pricePerNight * daysOfStay;
+  // const totalAmount = room.pricePerNight * daysOfStay;
+   const totalAmount = room.price_per_night * days_of_stay;
 
   return (
     <div>
@@ -261,17 +282,18 @@ const DatePicker: React.FC<Props> = ({ room }) => {
         <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
           <p className="text-tiny uppercase font-bold">Select Date</p>
           <h4 className="font-bold text-large mb-2">
-            ₱ {room?.pricePerNight} <span></span>/ night
+            {/* ₱ {room?.pricePerNight} <span></span>/ night */}
+             ₱ {room?.price_per_night} <span></span>/ night
           </h4>
           <Divider />
         </CardHeader>
         <CardBody className="overflow-visible py-2">
           <DateRangePicker
             className="custom"
-            selected={checkInDate}
+            selected={check_in_date}
             onChange={onChange}
-            startDate={checkInDate}
-            endDate={checkOutDate}
+            startDate={check_in_date}
+            endDate={check_out_date}
             minDate={new Date()}
             excludeDates={excludeDates}
             selectsRange

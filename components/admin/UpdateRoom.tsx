@@ -668,11 +668,11 @@ import {
   Textarea,
   Spinner,
 } from "@heroui/react";
-import { IRoom } from "@/backend/models/room";
 import { useRouter } from "next/navigation";
 import { useUpdateRoomMutation } from "@/redux/api/roomApi";
 import toast from "react-hot-toast";
 import { revalidateTag } from "@/helpers/revalidate";
+import { IRoom } from "@/types/room";
 
 interface Props {
   data: {
@@ -692,18 +692,31 @@ const UpdateRoom = ({ data }: Props) => {
   const room = data?.room;
 
   const [roomDetails, setRoomDetails] = useState({
+    // name: room?.name || "",
+    // price: room?.pricePerNight || 0,
+    // description: room?.description || "",
+    // address: room?.address || "",
+    // category: room?.category || "",
+    // guestCapacity: room?.guestCapacity || 1,
+    // numOfBeds: room?.numOfBeds || 1,
+    // internet: room?.isInternet || false,
+    // breakfast: room?.isBreakfast || false,
+    // airConditioned: room?.isAirConditioned || false,
+    // petsAllowed: room?.isPetsAllowed || false,
+    // roomCleaning: room?.isRoomCleaning || false,
+
     name: room?.name || "",
-    price: room?.pricePerNight || 0,
+    price_per_night: room?.price_per_night || 0,
     description: room?.description || "",
     address: room?.address || "",
     category: room?.category || "",
-    guestCapacity: room?.guestCapacity || 1,
-    numOfBeds: room?.numOfBeds || 1,
-    internet: room?.isInternet || false,
-    breakfast: room?.isBreakfast || false,
-    airConditioned: room?.isAirConditioned || false,
-    petsAllowed: room?.isPetsAllowed || false,
-    roomCleaning: room?.isRoomCleaning || false,
+    guest_capacity: room?.guest_capacity || 1,
+    num_of_beds: room?.num_of_Beds || 1,
+    is_internet: room?.is_internet || false,
+    breakfast: room?.is_breakfast || false,
+    is_air_conditioned: room?.is_air_conditioned || false,
+    is_pets_allowed: room?.is_pets_allowed || false,
+    is_room_cleaning: room?.is_room_cleaning || false,
   });
 
   const router = useRouter();
@@ -731,22 +744,25 @@ const UpdateRoom = ({ data }: Props) => {
 
     const roomData = {
       name: roomDetails.name,
-      pricePerNight: roomDetails.price,
+      price_per_night: Number(roomDetails.price_per_night),
       description: roomDetails.description,
       address: roomDetails.address,
       category: roomDetails.category,
-      guestCapacity: Number(roomDetails.guestCapacity),
-      numOfBeds: Number(roomDetails.numOfBeds),
-      isInternet: roomDetails.internet,
-      isBreakfast: roomDetails.breakfast,
-      isAirConditioned: roomDetails.airConditioned,
-      isPetsAllowed: roomDetails.petsAllowed,
-      isRoomCleaning: roomDetails.roomCleaning,
+      capacity: Number(roomDetails.guest_capacity),
+      num_of_beds: Number(roomDetails.num_of_beds),
+      is_internet: roomDetails.is_internet,
+      is_breakfast: roomDetails.breakfast,
+      is_air_conditioned: roomDetails.is_air_conditioned,
+      is_pets_allowed: roomDetails.is_pets_allowed,
+      is_room_cleaning: roomDetails.is_room_cleaning,
       images: [...oldImages, ...images.map((img) => img)],
     };
 
-    updateRoom({ id: room._id, body: roomData });
+    // updateRoom({ id: room._id, body: roomData });
+    updateRoom({ id: room.id, body: roomData });
+     console.log(updateRoom)
   };
+ 
 
   // Fix here: refine type guard for checkbox
   const onChange = (
@@ -788,11 +804,11 @@ const UpdateRoom = ({ data }: Props) => {
   };
 
   const roomFeatures: { name: string; value: keyof typeof roomDetails }[] = [
-    { name: "Internet", value: "internet" },
+    { name: "Internet", value: "is_internet" },
     { name: "Breakfast", value: "breakfast" },
-    { name: "Air Conditioned", value: "airConditioned" },
-    { name: "Pets Allowed", value: "petsAllowed" },
-    { name: "Room Cleaning", value: "roomCleaning" },
+    { name: "Air Conditioned", value: "is_air_conditioned" },
+    { name: "Pets Allowed", value: "is_pets_allowed" },
+    { name: "Room Cleaning", value: "is_room_cleaning" },
   ];
 
   return (
@@ -826,9 +842,9 @@ const UpdateRoom = ({ data }: Props) => {
               <Input
                 type="text"
                 label="Price"
-                name="price"
+                name="price_per_night"
                 onChange={onChange}
-                value={roomDetails.price.toString()}
+                value={roomDetails.price_per_night.toString()}
                 isRequired
               />
               <Input
@@ -855,8 +871,8 @@ const UpdateRoom = ({ data }: Props) => {
               </select>
               <select
                 className={selectStyles}
-                name="guestCapacity"
-                value={roomDetails.guestCapacity}
+                name="guest_capacity"
+                value={roomDetails.guest_capacity}
                 onChange={onChange}
               >
                 {[1, 2, 3, 4, 5, 6].map((num) => (
@@ -866,8 +882,8 @@ const UpdateRoom = ({ data }: Props) => {
                 ))}
               </select>
               <select
-                name="numOfBeds"
-                value={roomDetails.numOfBeds}
+                name="num_of_beds"
+                value={roomDetails.num_of_beds}
                 onChange={onChange}
                 className={selectStyles}
               >
@@ -1008,11 +1024,7 @@ const UpdateRoom = ({ data }: Props) => {
           </CardBody>
           <Divider />
           <CardFooter className="flex justify-end">
-            <Button
-              color="danger"
-              type="submit"
-              isDisabled={isLoading}
-            >
+            <Button color="danger" type="submit" isDisabled={isLoading}>
               {isLoading ? <Spinner color="default" size="sm" /> : "Update"}
             </Button>
           </CardFooter>

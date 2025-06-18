@@ -31,7 +31,7 @@ interface Props {
   salesData: salesData[];
 }
 
-export const SalesCharts = ({ salesData}: Props) => {
+export const SalesCharts = ({ salesData }: Props) => {
   const options = {
     responsive: true,
     interaction: {
@@ -56,8 +56,8 @@ export const SalesCharts = ({ salesData}: Props) => {
         display: true,
         position: "right" as const,
         grid: {
-            drawOnChartArea: false,
-        }
+          drawOnChartArea: false,
+        },
       },
     },
   };
@@ -68,7 +68,6 @@ export const SalesCharts = ({ salesData}: Props) => {
       {
         label: "Sales",
         data: salesData?.map((data) => data.totalSales).reverse(),
-        
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",
         yAxisID: "y",

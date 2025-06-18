@@ -12,10 +12,11 @@ import {
   Input,
   Spinner,
 } from "@heroui/react";
-import { IUser } from "@/backend/models/user";
+// import { IUser } from "@/backend/models/user";
 import { useRouter } from "next/navigation";
 import { useUpdateUserMutation } from "@/redux/api/userApi";
 import toast from "react-hot-toast";
+import { IUser } from "@/types/user";
 
 const selectStyles =
   "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-4 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500";
@@ -55,7 +56,7 @@ const UpdateUser = ({ data }: Props) => {
         email,
         role,
     }
-    updateUser({ id: data?.user?._id, body: userData });
+    updateUser({ id: data?.user?.id, body: userData });
   }
   return (
     <div className="mt-10">

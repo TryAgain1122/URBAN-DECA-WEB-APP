@@ -51,7 +51,8 @@ export const HomePage: React.FC<Props> = ({ data }) => {
                 No Rooms
               </div>
             ) : (
-              rooms?.map((room) => <RoomItem room={room} key={room._id as React.Key} />)
+              // rooms?.map((room) => <RoomItem room={room} key={room._id as React.Key} />)
+               rooms?.map((room) => <RoomItem room={room} key={room.id as React.Key} />)
             )}
           </div>
         </div>

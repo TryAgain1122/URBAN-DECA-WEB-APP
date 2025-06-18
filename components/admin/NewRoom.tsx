@@ -22,50 +22,50 @@ import toast from "react-hot-toast";
 
 interface RoomDetails {
   name: string;
-  price: number;
+  price_per_night: number;
   description: string;
   address: string;
   category: string;
-  guestCapacity: number;
-  numOfBeds: number;
-  internet: boolean;
-  breakfast: boolean;
-  airConditioned: boolean;
-  petsAllowed: boolean;
-  roomCleaning: boolean;
+  guest_capacity: number;
+  num_of_beds: number;
+  is_internet: boolean;
+  is_breakfast: boolean;
+  is_air_conditioned: boolean;
+  is_pets_allowed: boolean;
+  is_room_cleaning: boolean;
 }
 
 const NewRoom = () => {
   const [roomDetails, setRoomDetails] = useState<RoomDetails>({
     name: "",
-    price: 0,
+    price_per_night: 0,
     description: "",
     address: "",
     category: "King",
-    guestCapacity: 1,
-    numOfBeds: 1,
-    internet: false,
-    breakfast: false,
-    airConditioned: false,
-    petsAllowed: false,
-    roomCleaning: false,
+    guest_capacity: 1,
+    num_of_beds: 1,
+    is_internet: false,
+    is_breakfast: false,
+    is_air_conditioned: false,
+    is_pets_allowed: false,
+    is_room_cleaning: false,
   });
 
   const [images, setImage] = useState<string[]>([]);
 
   const {
     name,
-    price,
+    price_per_night,
     description,
     address,
     category,
-    guestCapacity,
-    numOfBeds,
-    internet,
-    breakfast,
-    airConditioned,
-    petsAllowed,
-    roomCleaning,
+    guest_capacity,
+    num_of_beds,
+    is_internet,
+    is_breakfast,
+    is_air_conditioned,
+    is_pets_allowed,
+    is_room_cleaning
   } = roomDetails;
 
   const router = useRouter();
@@ -73,7 +73,8 @@ const NewRoom = () => {
 
   useEffect(() => {
     if (error && (error as any)?.data?.errMessage) {
-      const errorMessage = (error as any).data.errMessage || "An error occurred";
+      const errorMessage =
+        (error as any).data.errMessage || "An error occurred";
       toast.error(errorMessage);
     }
 
@@ -89,33 +90,47 @@ const NewRoom = () => {
     const formattedDescription = description
       .split(/\n|\\n/)
       .map((line) =>
-        line.trim().match(/^[-•]/)
-          ? `\n${line.trim()}`
-          : line.trim()
+        line.trim().match(/^[-•]/) ? `\n${line.trim()}` : line.trim()
       )
       .join(" ");
 
     const roomData = {
+      // name,
+      // pricePerNight: price,
+      // description: formattedDescription,
+      // address,
+      // category,
+      // guestCapacity: Number(guestCapacity),
+      // numOfBeds: Number(numOfBeds),
+      // isInternet: internet,
+      // isBreakfast: breakfast,
+      // isAirConditioned: airConditioned,
+      // isPetsAllowed: petsAllowed,
+      // isRoomCleaning: roomCleaning,
+      // images,
       name,
-      pricePerNight: price,
+      price_per_night: price_per_night,
       description: formattedDescription,
-      address,
-      category,
-      guestCapacity: Number(guestCapacity),
-      numOfBeds: Number(numOfBeds),
-      isInternet: internet,
-      isBreakfast: breakfast,
-      isAirConditioned: airConditioned,
-      isPetsAllowed: petsAllowed,
-      isRoomCleaning: roomCleaning,
+      address: address,
+      category: category,
+      guest_capacity: Number(guest_capacity),
+      num_of_beds: Number(num_of_beds),
+      is_internet: is_internet,
+      is_breakfast: is_breakfast,
+      is_air_conditioned: is_air_conditioned,
+      is_pets_allowed: is_pets_allowed,
+      is_room_cleaning: is_room_cleaning,
       images,
     };
 
     newRoom(roomData);
+    console.log("Sending Data :", roomData);
   };
 
   const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     setRoomDetails({
       ...roomDetails,
@@ -145,12 +160,22 @@ const NewRoom = () => {
     }
   };
 
+  const handleSelectChange = (
+    key: keyof RoomDetails,
+    value: string | number
+  ) => {
+    setRoomDetails((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   const roomFeatures: { name: string; value: keyof RoomDetails }[] = [
-    { name: "Internet", value: "internet" },
-    { name: "Breakfast", value: "breakfast" },
-    { name: "Air Conditioned", value: "airConditioned" },
-    { name: "Pets Allowed", value: "petsAllowed" },
-    { name: "Room Cleaning", value: "roomCleaning" },
+    { name: "Internet", value: "is_internet" },
+    { name: "Breakfast", value: "is_breakfast" },
+    { name: "Air Conditioned", value: "is_air_conditioned" },
+    { name: "Pets Allowed", value: "is_pets_allowed" },
+    { name: "Room Cleaning", value: "is_room_cleaning" },
   ];
 
   return (
@@ -186,10 +211,10 @@ const NewRoom = () => {
               <Input
                 type="number"
                 label="Price per Night"
-                name="price"
+                name="price_per_night"
                 className="mb-4"
                 onChange={onChange}
-                value={price.toString()}
+                value={price_per_night.toString()}
                 isRequired
                 variant="bordered"
               />
@@ -210,8 +235,10 @@ const NewRoom = () => {
               <Select
                 label="Room Category"
                 className="w-full mb-4"
-                onChange={onChange}
-                value={category}
+                // onChange={onChange}
+                // value={category}
+                selectedKeys={[category]}
+                onChange={(e) => handleSelectChange("category", e.target.value)}
                 name="category"
               >
                 {["King", "Single", "Twins"].map((bed) => (
@@ -225,8 +252,8 @@ const NewRoom = () => {
                 label="Guest Capacity"
                 className="w-full mb-4"
                 onChange={onChange}
-                value={guestCapacity.toString()}
-                name="guestCapacity"
+                value={guest_capacity.toString()}
+                name="guest_capacity"
               >
                 {["1", "2", "3", "4", "5", "6"].map((num) => (
                   <SelectItem color="danger" key={num}>
@@ -238,8 +265,10 @@ const NewRoom = () => {
               <Select
                 label="Number of Beds"
                 className="w-full mb-4"
-                onChange={onChange}
-                value={numOfBeds.toString()}
+                // onChange={onChange}
+                // value={numOfBeds.toString()}
+                selectedKeys={[num_of_beds.toString()]}
+                onChange={(e) => handleSelectChange("num_of_beds", Number(e.target.value))}
                 name="numOfBeds"
               >
                 {["1", "2", "3"].map((num) => (
@@ -294,7 +323,11 @@ const NewRoom = () => {
           </CardBody>
           <CardFooter className="w-full">
             <Button color="danger" type="submit" disabled={isLoading}>
-              {isLoading ? <Spinner color="default" size="sm" /> : "Create Room"}
+              {isLoading ? (
+                <Spinner color="default" size="sm" />
+              ) : (
+                "Create Room"
+              )}
             </Button>
           </CardFooter>
         </Card>

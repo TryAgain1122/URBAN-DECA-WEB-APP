@@ -1,14 +1,14 @@
 "use client";
 
-import { IImage } from "@/backend/models/room";
-import Image from "next/image";
+import { IImage } from "@/types/room";
+// import { IImage } from "@/backend/models/room";
 import React, { useEffect, useState } from "react";
 
 interface Props {
   images: IImage[];
 }
 
-const HotelPhotoGallery: React.FC<Props> = ({ images }) => {
+const HotelPhotoGallery: React.FC<Props> = ({ images = [] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,21 +16,21 @@ const HotelPhotoGallery: React.FC<Props> = ({ images }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (!isPaused) {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % images?.length);
       }
     }, 3000); // Change slide every 3 seconds
 
     return () => clearInterval(interval);
-  }, [isPaused, images.length]);
+  }, [isPaused, images?.length]);
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? images?.length - 1 : prevIndex - 1
     );
   };
 
   const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images?.length);
   };
 
   const openModal = () => {
@@ -42,6 +42,8 @@ const HotelPhotoGallery: React.FC<Props> = ({ images }) => {
     setIsModalOpen(false);
     setIsPaused(false); // Resume the carousel when the modal is closed
   };
+
+  console.log("images: ", images)
   return (
     <div className="relative w-full h-64 md:h-96 overflow-x-hidden rounded-lg">
       <div
@@ -54,7 +56,7 @@ const HotelPhotoGallery: React.FC<Props> = ({ images }) => {
           className="w-full h-full flex transition-transform duration-500"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
-          {images.map((image, index) => (
+          {images?.map((image, index) => (
             <div
               key={index}
               className="w-full h-full flex-shrink-0 cursor-pointer rounded-lg"
@@ -85,7 +87,7 @@ const HotelPhotoGallery: React.FC<Props> = ({ images }) => {
 
       {/* Indicators */}
       <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-        {images.map((_, index) => (
+        {images?.map((_, index) => (
           <div
             key={index}
             className={`w-3 h-3 bg-white rounded-full ${

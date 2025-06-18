@@ -8,19 +8,29 @@ import { TopPerformingChart } from "../charts/TopPerformingChart";
 import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
 import { SalesCharts } from "../charts/SalesCharts";
-import { Card, CardHeader, CardBody, Image, Spinner, Button } from "@heroui/react";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  Image,
+  Spinner,
+  Button,
+} from "@heroui/react";
 
 const Dashboard = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [buttonLoading, setButtonLoading] = useState(false); // custom button loading state
 
-  const [getSalesStats, { error, data, isLoading }] = useLazyGetSalesStatsQuery();
+  const [getSalesStats, { error, data, isLoading }] =
+    useLazyGetSalesStatsQuery();
 
   useEffect(() => {
     if (error && "data" in error) {
-      const errorMessage = (error as any)?.data?.errMessage || "An error occurred";
+      const errorMessage =
+        (error as any)?.data?.errMessage || "An error occurred";
       toast.error(errorMessage);
+       console.error("❌ useEffect error:", error);
     }
 
     if (startDate && endDate && !data) {
@@ -39,11 +49,14 @@ const Dashboard = () => {
         endDate: endDate.toISOString(),
       }).unwrap();
 
+      console.log("📊 Sales Stats Response:", response);
+
       if (response?.data && response.data.length === 0) {
         toast.error("No records found!");
       }
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error fetching sales stats:", err);
+      toast.error("Failed to fetch stats.");
     } finally {
       setButtonLoading(false); // Reset button loading state
     }
@@ -84,12 +97,18 @@ const Dashboard = () => {
           />
         </div>
         <Button
-          className={`font-semibold py-2 px-5 mt-3  md:ml-4 rounded-md ${buttonLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+          className={`font-semibold py-2 px-5 mt-3  md:ml-4 rounded-md ${
+            buttonLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           color="danger"
           onClick={submitHandler}
           disabled={buttonLoading || isLoading} // Disable button if loading
         >
-          {buttonLoading ? <Button isLoading color="danger"></Button> : "Submit"}
+          {buttonLoading ? (
+            <Button isLoading color="danger"></Button>
+          ) : (
+            "Submit"
+          )}
         </Button>
       </div>
 

@@ -1,6 +1,7 @@
+import { IUser } from "@/types/user";
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
-import { IUser } from "../models/user";
+// import { IUser } from "../models/user";
 
 export const isAuthenticatedUser = async (
   req: NextRequest,

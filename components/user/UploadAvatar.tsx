@@ -39,7 +39,7 @@ const UploadAvatar = () => {
 
     useEffect(() => {
         if (user?.avatar) {
-            setAvatarPreview(user?.avatar?.url);
+            setAvatarPreview(user?.avatar_url);
         }
 
         if (error && "data" in error) {
@@ -49,9 +49,9 @@ const UploadAvatar = () => {
 
         if (isSuccess) {
             updateSession(undefined).then((res) => {
-                if (res?.data?.user?.avatar?.url) {
+                if (res?.data?.user?.avatar_url) {
                     dispatch(setUser(res.data.user));
-                    setAvatarPreview(res.data.user.avatar.url);
+                    setAvatarPreview(res.data.user.avatar_url);
                 }
                 router.refresh();
                 toast.success("Image Uploaded")

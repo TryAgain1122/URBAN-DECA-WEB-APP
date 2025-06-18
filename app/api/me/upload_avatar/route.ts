@@ -1,4 +1,4 @@
-import dbConnect from "@/backend/config/dbConnect";
+import dbConnect, { connectToPostgres } from "@/backend/config/dbConnect";
 import { uploadAvatar } from "@/backend/controllers/authControllers";
 import { isAuthenticatedUser } from "@/backend/middlewares/auth";
 import { createEdgeRouter } from "next-connect";
@@ -9,7 +9,7 @@ interface RequestContext {}
 
 const router = createEdgeRouter<NextRequest, RequestContext>();
 
-dbConnect();
+connectToPostgres();
 
 router.use(isAuthenticatedUser).put(uploadAvatar);
 

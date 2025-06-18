@@ -68,7 +68,7 @@ export const roomApi = createApi({
     getRoomReviews: builder.query({
       query(id) {
         return {
-          url: `admin/rooms/reviews?roomId=${id}`,
+          url: `admin/rooms/reviews?room_id=${id}`,
         };
       },
       providesTags: ["Reviews"],
@@ -76,7 +76,7 @@ export const roomApi = createApi({
     deleteReview: builder.mutation({
       query({ id, roomId }) {
         return {
-          url: `/admin/rooms/reviews/?id=${id}&roomId=${roomId}`,
+          url: `/admin/rooms/reviews/?id=${id}&room_id=${roomId}`,
           method: "DELETE",
         };
       },

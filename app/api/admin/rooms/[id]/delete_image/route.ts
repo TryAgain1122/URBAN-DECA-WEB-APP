@@ -1,4 +1,4 @@
-import dbConnect from "@/backend/config/dbConnect";
+import dbConnect, { connectToPostgres } from "@/backend/config/dbConnect";
 import {
   deleteRoomImage,
 } from "@/backend/controllers/roomControllers";
@@ -17,7 +17,7 @@ interface RequestContext {
 
 const router = createEdgeRouter<NextRequest, RequestContext>();
 
-dbConnect();
+connectToPostgres();
 
 router.use(isAuthenticatedUser, authorizeRoles("admin")).put(deleteRoomImage);
 

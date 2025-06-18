@@ -1,4 +1,4 @@
-import dbConnect from "@/backend/config/dbConnect";
+import dbConnect, { connectToPostgres } from "@/backend/config/dbConnect";
 import { confirmBooking } from "@/backend/controllers/bookingControllers";
 import { isAuthenticatedUser, authorizeRoles } from "@/backend/middlewares/auth";
 import { createEdgeRouter } from "next-connect";
@@ -11,7 +11,7 @@ interface RequestContext {
 }
 
 const router = createEdgeRouter<NextRequest, RequestContext>();
-dbConnect();
+connectToPostgres();
 
 router.use(isAuthenticatedUser);
 router.use(authorizeRoles("admin")); // Only admin can approve/reject

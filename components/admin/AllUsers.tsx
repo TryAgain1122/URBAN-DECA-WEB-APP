@@ -18,10 +18,11 @@ import {
   useDisclosure,
   Pagination,
 } from "@heroui/react";
-import { IUser } from "@/backend/models/user";
+// import { IUser } from "@/backend/models/user";
 import { useRouter } from "next/navigation";
 import { useDeleteUserMutation } from "@/redux/api/userApi";
 import toast from "react-hot-toast";
+import { IUser } from "@/types/user";
 
 interface Props {
   data: {
@@ -67,13 +68,15 @@ const AllUsers = ({ data }: Props) => {
 
     users?.forEach((user) => {
       data?.rows.push({
-        id: user._id,
+        // id: user._id,
+        id: user.id,
         name: user?.name,
         email: user?.email,
         role: user?.role,
         actions: (
           <div className="flex gap-4">
-            <Link href={`/admin/users/${user._id}`} color="secondary">
+            {/* <Link href={`/admin/users/${user._id}`} color="secondary"> */}
+             <Link href={`/admin/users/${user.id}`} color="secondary">
               <i className="fa fa-pencil"></i>{" "}
             </Link>
             <Button isIconOnly onPress={onOpen} color="danger">
@@ -97,7 +100,8 @@ const AllUsers = ({ data }: Props) => {
                       <Button
                         color="secondary"
                         onPress={onClose}
-                        onClick={() => deleteUserHandler(user._id as string)}
+                        // onClick={() => deleteUserHandler(user._id as string)}
+                         onClick={() => deleteUserHandler(user.id as string)}
                       >
                         Yes
                       </Button>

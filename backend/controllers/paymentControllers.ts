@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
-import User from "../models/user";
-import Room from '../models/room';
+// import User from "../models/user";
+// import Room from '../models/room';
 import axios from "axios";
 import db from "../config/dbConnect"
-import Booking from '../models/booking'
+// import Booking from '../models/booking'
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // // Genereate stripe checkout session  =>  /api/payment/checkout_session/:roomId
@@ -96,7 +96,7 @@ import Booking from '../models/booking'
 //     return NextResponse.json({ errMessage: error?.message });
 //   }
 // };
-
+import pool from '@/backend/config/dbConnect';
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET_KEY;
 const PAYPAL_API = process.env.PAYPAL_API;
@@ -256,8 +256,6 @@ const PAYPAL_API = process.env.PAYPAL_API;
 //     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
 //   }
 // };
-
-
 // export const webhookCheckout = async (req: NextRequest) => {
 //   try {
 //     const event = await req.json();
@@ -306,114 +304,10 @@ const PAYPAL_API = process.env.PAYPAL_API;
 //   }
 // };
 
+//FOR PAYPAL
 //Generate PAypal Checkout Session  => /api/payment/checkout_session/:roomId
-export const paypalCheckoutSession = catchAsyncErrors(
-  async (req: NextRequest, { params }: { params: { id: string}}) => {
-    const { searchParams } = new URL(req.url);
-
-    const checkInDate = searchParams.get("checkInDate");
-    const checkOutDate = searchParams.get("checkOutDate");
-    const daysOfStay = searchParams.get("daysOfStay");
-    const roomAmount = searchParams.get("amount");
-
-    // Get room Details 
-    const room = await Room.findById(params.id);
-
-    // Gety Paypal Access token 
-    const tokenResponse = await axios.post(
-      `${PAYPAL_API}/v1/oauth2/token`,
-      "grant_type=client_credentials",
-      {
-        auth: {
-          username: PAYPAL_CLIENT_ID!,
-          password: PAYPAL_SECRET!,
-        },
-        headers: {
-          "Content-Type":  "application/x-www-form-urlencoded",
-        }
-      }
-    );
-
-    const accessToken = tokenResponse.data.access_token;
-
-    //create paypal order 
-    const orderResponse = await axios.post(
-      `${PAYPAL_API}/v2/checkout/orders`,
-      {
-        intent: "CAPTURE",
-        purchase_units: [
-          {
-            reference_id: params.id,
-            amount: {
-              currency_code: "PHP",
-              value: roomAmount,
-            },
-            description: `Booking for ${room?.name}`,
-            custom_id: `${checkInDate}|${checkOutDate}|${daysOfStay}`,
-          }
-        ],
-        application_context: {
-          return_url: `${process.env.API_URL}/bookings/me`,
-          cancel_url: `${process.env.API_URL}/room/${room?._id}`,
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return NextResponse.json(orderResponse.data)
-  }
-);
-
-// Create new Booking after payment => /api/payment/webhook
-export const webhookCheckout = async (req: NextRequest) => {
-  try {
-    const event = await req.json();
-    console.log("Paypal Webhook Event:", event);
-
-    if (event.event_type === "CHECKOUT.ORDER.APPROVED") {
-      const order = event.resource;
-      const user = await User.findOne({ email: order.payer.email_address });
-      if (!user) return NextResponse.json({ success: false})
-
-        const room = order.purchase_units[0].reference_id;
-        const amountPaid = order.purchase_units[0].amount.value;
-        const metadata = order.purchase_units[0].custom_id?.split("|") || [];
-        const [checkInDate, checkOutDate, daysOfStay] = metadata;
-  
-        await Booking.create({
-          room,
-          user: user.id,
-          checkInDate,
-          checkOutDate,
-          daysOfStay,
-          amountPaid,
-          paymentInfo: {
-            id: order.id,
-            status: order.status,
-          },
-          paidAt: Date.now(),
-        });
-
-        console.log("✅ Booking created successfully");
-        return NextResponse.json({ success: true });
-    }
-  } catch (error: any) {
-    console.error("❌ Error in PayPal webhook:", error);
-    return NextResponse.json({ errMessage: error?.message })
-  }
-}
-
-
-
-//PostgreSql
-
-// CREATE PAYPAL ORDER SESSION
 // export const paypalCheckoutSession = catchAsyncErrors(
-//   async (req: NextRequest, { params }: { params: { id: string } }) => {
+//   async (req: NextRequest, { params }: { params: { id: string}}) => {
 //     const { searchParams } = new URL(req.url);
 
 //     const checkInDate = searchParams.get("checkInDate");
@@ -421,15 +315,10 @@ export const webhookCheckout = async (req: NextRequest) => {
 //     const daysOfStay = searchParams.get("daysOfStay");
 //     const roomAmount = searchParams.get("amount");
 
-//     // ✅ Get room details from PostgreSQL
-//     const roomRes = await pool.query("SELECT * FROM rooms WHERE id = $1", [params.id]);
-//     if (roomRes.rows.length === 0) {
-//       return NextResponse.json({ error: "Room not found" }, { status: 404 });
-//     }
+//     // Get room Details 
+//     const room = await Room.findById(params.id);
 
-//     const room = roomRes.rows[0];
-
-//     // ✅ Get PayPal access token
+//     // Gety Paypal Access token 
 //     const tokenResponse = await axios.post(
 //       `${PAYPAL_API}/v1/oauth2/token`,
 //       "grant_type=client_credentials",
@@ -439,14 +328,14 @@ export const webhookCheckout = async (req: NextRequest) => {
 //           password: PAYPAL_SECRET!,
 //         },
 //         headers: {
-//           "Content-Type": "application/x-www-form-urlencoded",
-//         },
+//           "Content-Type":  "application/x-www-form-urlencoded",
+//         }
 //       }
 //     );
 
 //     const accessToken = tokenResponse.data.access_token;
 
-//     // ✅ Create PayPal order
+//     //create paypal order 
 //     const orderResponse = await axios.post(
 //       `${PAYPAL_API}/v2/checkout/orders`,
 //       {
@@ -458,13 +347,13 @@ export const webhookCheckout = async (req: NextRequest) => {
 //               currency_code: "PHP",
 //               value: roomAmount,
 //             },
-//             description: `Booking for ${room.name}`,
+//             description: `Booking for ${room?.name}`,
 //             custom_id: `${checkInDate}|${checkOutDate}|${daysOfStay}`,
-//           },
+//           }
 //         ],
 //         application_context: {
 //           return_url: `${process.env.API_URL}/bookings/me`,
-//           cancel_url: `${process.env.API_URL}/room/${room.id}`,
+//           cancel_url: `${process.env.API_URL}/room/${room?._id}`,
 //         },
 //       },
 //       {
@@ -474,101 +363,211 @@ export const webhookCheckout = async (req: NextRequest) => {
 //         },
 //       }
 //     );
-
-//     return NextResponse.json(orderResponse.data);
+//     return NextResponse.json(orderResponse.data)
 //   }
 // );
 
-// // ✅ HANDLE PAYPAL WEBHOOK
+// // Create new Booking after payment => /api/payment/webhook
 // export const webhookCheckout = async (req: NextRequest) => {
 //   try {
 //     const event = await req.json();
-//     console.log("✅ PayPal Webhook Event:", event);
+//     console.log("Paypal Webhook Event:", event);
 
-//     if (event.event_type === "PAYMENT.CAPTURE.COMPLETED") {
-//       const capture = event.resource;
+//     if (event.event_type === "CHECKOUT.ORDER.APPROVED") {
+//       const order = event.resource;
+//       const user = await User.findOne({ email: order.payer.email_address });
+//       if (!user) return NextResponse.json({ success: false})
 
-//       const userEmail = capture?.payer?.email_address;
-//       if (!userEmail) {
-//         return NextResponse.json({ success: false, message: "User email missing" });
-//       }
-
-//       // ✅ Get user from PostgreSQL
-//       const userRes = await pool.query("SELECT id FROM users WHERE email = $1", [userEmail]);
-//       if (userRes.rows.length === 0) {
-//         return NextResponse.json({ success: false, message: "User not found" });
-//       }
-
-//       const userId = userRes.rows[0].id;
-
-//       // ✅ Get PayPal access token again
-//       const tokenResponse = await axios.post(
-//         `${PAYPAL_API}/v1/oauth2/token`,
-//         "grant_type=client_credentials",
-//         {
-//           auth: {
-//             username: PAYPAL_CLIENT_ID!,
-//             password: PAYPAL_SECRET!,
-//           },
-//           headers: {
-//             "Content-Type": "application/x-www-form-urlencoded",
-//           },
-//         }
-//       );
-
-//       const accessToken = tokenResponse.data.access_token;
-
-//       // ✅ Fetch order details
-//       const orderId = capture?.supplementary_data?.related_ids?.order_id;
-//       const orderResponse = await axios.get(
-//         `${PAYPAL_API}/v2/checkout/orders/${orderId}`,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${accessToken}`,
-//           },
-//         }
-//       );
-
-//       const purchaseUnit = orderResponse.data.purchase_units?.[0];
-//       const roomId = purchaseUnit.reference_id;
-//       const amountPaid = purchaseUnit.amount.value;
-//       const [checkInDate, checkOutDate, daysOfStay] = (purchaseUnit.custom_id || "").split("|");
-
-//       // ✅ Insert Booking into PostgreSQL
-//       await pool.query(
-//         `INSERT INTO bookings (
-//             room_id, user_id, check_in_date, check_out_date,
-//             amount_paid, days_of_stay, payment_id, payment_status,
-//             paid_at, status, cancellation_confirmed
-//          )
-//          VALUES (
-//             $1, $2, $3, $4,
-//             $5, $6, $7, $8,
-//             CURRENT_TIMESTAMP, $9, $10
-//          )`,
-//         [
-//           roomId,
-//           userId,
+//         const room = order.purchase_units[0].reference_id;
+//         const amountPaid = order.purchase_units[0].amount.value;
+//         const metadata = order.purchase_units[0].custom_id?.split("|") || [];
+//         const [checkInDate, checkOutDate, daysOfStay] = metadata;
+  
+//         await Booking.create({
+//           room,
+//           user: user.id,
 //           checkInDate,
 //           checkOutDate,
-//           amountPaid,
 //           daysOfStay,
-//           capture.id,
-//           capture.status.toLowerCase(),
-//           "confirmed", // default status
-//           false,
-//         ]
-//       );
+//           amountPaid,
+//           paymentInfo: {
+//             id: order.id,
+//             status: order.status,
+//           },
+//           paidAt: Date.now(),
+//         });
 
-//       console.log("✅ Booking created in PostgreSQL");
-//       return NextResponse.json({ success: true });
+//         console.log("✅ Booking created successfully");
+//         return NextResponse.json({ success: true });
 //     }
-
-//     return NextResponse.json({ success: false, message: "Event type not handled" });
 //   } catch (error: any) {
-//     console.error("❌ PayPal Webhook Error:", error.message);
-//     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+//     console.error("❌ Error in PayPal webhook:", error);
+//     return NextResponse.json({ errMessage: error?.message })
 //   }
-// };
+// }
+
+
+
+//PostgreSql
+
+//CREATE PAYPAL ORDER SESSION
+export const paypalCheckoutSession = catchAsyncErrors(
+  async (req: NextRequest, { params }: { params: { id: string } }) => {
+    const { searchParams } = new URL(req.url);
+
+    const checkInDate = searchParams.get("check_in_date");
+    const checkOutDate = searchParams.get("check_out_date");
+    const daysOfStay = searchParams.get("days_of_Stay");
+    const roomAmount = searchParams.get("amount");
+
+    // ✅ Get room details from PostgreSQL
+    const roomRes = await pool.query("SELECT * FROM rooms WHERE id = $1", [params.id]);
+    if (roomRes.rows.length === 0) {
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    }
+
+    const room = roomRes.rows[0];
+
+    // ✅ Get PayPal access token
+    const tokenResponse = await axios.post(
+      `${PAYPAL_API}/v1/oauth2/token`,
+      "grant_type=client_credentials",
+      {
+        auth: {
+          username: PAYPAL_CLIENT_ID!,
+          password: PAYPAL_SECRET!,
+        },
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // ✅ Create PayPal order
+    const orderResponse = await axios.post(
+      `${PAYPAL_API}/v2/checkout/orders`,
+      {
+        intent: "CAPTURE",
+        purchase_units: [
+          {
+            reference_id: params.id,
+            amount: {
+              currency_code: "PHP",
+              value: roomAmount,
+            },
+            description: `Booking for ${room.name}`,
+            custom_id: `${checkInDate}|${checkOutDate}|${daysOfStay}`,
+          },
+        ],
+        application_context: {
+          return_url: `${process.env.API_URL}/bookings/me`,
+          cancel_url: `${process.env.API_URL}/room/${room.id}`,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return NextResponse.json(orderResponse.data);
+  }
+);
+
+// ✅ HANDLE PAYPAL WEBHOOK
+export const webhookCheckout = async (req: NextRequest) => {
+  try {
+    const event = await req.json();
+    console.log("✅ PayPal Webhook Event:", event);
+
+    if (event.event_type === "PAYMENT.CAPTURE.COMPLETED") {
+      const capture = event.resource;
+
+      const userEmail = capture?.payer?.email_address;
+      if (!userEmail) {
+        return NextResponse.json({ success: false, message: "User email missing" });
+      }
+
+      // ✅ Get user from PostgreSQL
+      const userRes = await pool.query("SELECT id FROM users WHERE email = $1", [userEmail]);
+      if (userRes.rows.length === 0) {
+        return NextResponse.json({ success: false, message: "User not found" });
+      }
+
+      const userId = userRes.rows[0].id;
+
+      // ✅ Get PayPal access token again
+      const tokenResponse = await axios.post(
+        `${PAYPAL_API}/v1/oauth2/token`,
+        "grant_type=client_credentials",
+        {
+          auth: {
+            username: PAYPAL_CLIENT_ID!,
+            password: PAYPAL_SECRET!,
+          },
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // ✅ Fetch order details
+      const orderId = capture?.supplementary_data?.related_ids?.order_id;
+      const orderResponse = await axios.get(
+        `${PAYPAL_API}/v2/checkout/orders/${orderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const purchaseUnit = orderResponse.data.purchase_units?.[0];
+      const roomId = purchaseUnit.reference_id;
+      const amountPaid = purchaseUnit.amount.value;
+      const [checkInDate, checkOutDate, daysOfStay] = (purchaseUnit.custom_id || "").split("|");
+
+      // ✅ Insert Booking into PostgreSQL
+      await pool.query(
+        `INSERT INTO bookings (
+            room_id, user_id, check_in_date, check_out_date,
+            amount_paid, days_of_stay, payment_id, payment_status,
+            paid_at, status, cancellation_confirmed
+         )
+         VALUES (
+            $1, $2, $3, $4,
+            $5, $6, $7, $8,
+            CURRENT_TIMESTAMP, $9, $10
+         )`,
+        [
+          roomId,
+          userId,
+          checkInDate,
+          checkOutDate,
+          amountPaid,
+          daysOfStay,
+          capture.id,
+          capture.status.toLowerCase(),
+          "confirmed", // default status
+          false,
+        ]
+      );
+
+      console.log("✅ Booking created in PostgreSQL");
+      return NextResponse.json({ success: true });
+    }
+
+    return NextResponse.json({ success: false, message: "Event type not handled" });
+  } catch (error: any) {
+    console.error("❌ PayPal Webhook Error:", error.message);
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+  }
+};
 
 

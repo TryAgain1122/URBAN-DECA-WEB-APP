@@ -1,6 +1,6 @@
 "use client";
 
-import { IRoom } from "@/backend/models/room";
+// import { IRoom } from "@/backend/models/room";
 import React from "react";
 import Container from "../Container";
 import HotelPhotoGallery from "../HotelPhotoGallery";
@@ -8,6 +8,7 @@ import RoomFeature from "./RoomFeature";
 import NewReviews from "../review/NewReviews";
 import ListReviews from "../review/ListReviews";
 import DatePicker from "../DatePicker";
+import { IRoom } from "@/types/room";
 
 interface Props {
   data: {
@@ -17,6 +18,8 @@ interface Props {
 
 const RoomDetails: React.FC<Props> = ({ data }) => {
   const room = data?.room;
+
+
 
   // Utility function to detect and format bullet points
   const formatDescription = (description: string) => {
@@ -40,10 +43,12 @@ const RoomDetails: React.FC<Props> = ({ data }) => {
     );
   }
 
+  console.log("Room Details: ", room)
+
   return (
     <Container>
       <div className="mx-auto mt-10 px-4 max-w-7xl">
-        <HotelPhotoGallery images={room?.images} />
+        <HotelPhotoGallery images={room?.images ?? []} />
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-8">
@@ -77,7 +82,7 @@ const RoomDetails: React.FC<Props> = ({ data }) => {
             <RoomFeature room={room} />
           </div>
           <div className="md:col-span-4">
-            <NewReviews roomId={room?._id as string}/>
+            <NewReviews roomId={room?.id as string}/>
             <ListReviews reviews={room?.reviews}/>
           </div>
         </div>
@@ -87,3 +92,6 @@ const RoomDetails: React.FC<Props> = ({ data }) => {
 };
 
 export default RoomDetails;
+
+
+

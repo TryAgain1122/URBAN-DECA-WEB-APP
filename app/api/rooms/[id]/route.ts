@@ -1,4 +1,4 @@
-import dbConnect from "@/backend/config/dbConnect";
+import dbConnect, { connectToPostgres } from "@/backend/config/dbConnect";
 import {
   getRoomDetails,
   updateRoom,
@@ -14,9 +14,16 @@ interface RequestContext {
 
 const router = createEdgeRouter<NextRequest, RequestContext>();
 
-dbConnect();
+router.get(async (req, ctx) => {
+    try {
+        await connectToPostgres();
+        return await getRoomDetails(req,ctx);
+    } catch (error) {
+        return new NextResponse("Database Connection Failed", { status: 500});
+    }
+})
 
-router.get(getRoomDetails);
+// router.get(getRoomDetails);
 
 export async function GET(request: NextRequest, ctx: RequestContext): Promise<NextResponse> {
   return router.run(request, ctx) as Promise<NextResponse>;

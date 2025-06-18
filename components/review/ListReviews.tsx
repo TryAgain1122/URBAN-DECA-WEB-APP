@@ -1,4 +1,5 @@
-import { IReview } from "@/backend/models/room";
+// import { IReview } from "@/backend/models/room";
+import { IReview } from "@/types/room";
 import React from "react";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 
@@ -22,18 +23,24 @@ const ListReviews = ({ reviews = [] }: Props) => {
 
             return (
               <div
-                key={review.id || review._id || idx}
+                // key={review.id || review._id || idx}
+                key={review.id || idx}
                 className="flex items-start gap-4 bg-white shadow-md rounded-lg p-4"
               >
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                   <img
                     src={
-                      review?.user?.avatar
-                      ? review?.user?.avatar?.url 
-                      : "/images/default_avatar.jpg"
+                      typeof review.user === "object" &&
+                      review.user?.avatar?.url
+                        ? review.user.avatar.url
+                        : "/images/default_avatar.jpg"
                     }
-                    alt={review?.user?.name || "Anonymous"}
+                    alt={
+                      typeof review.user === "object" && review.user?.name
+                        ? review.user.name
+                        : "Anonymous"
+                    }
                     width={60}
                     height={60}
                     className="w-12 h-12 rounded-full object-cover"

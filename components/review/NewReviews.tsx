@@ -28,6 +28,7 @@ const NewReviews = ({ roomId }: { roomId: string }) => {
 
   const { data } = useCanUserReviewQuery(roomId);
   const canReview = data?.canReview ?? false;
+  const hasReviewed = data?.hasReviewed ?? false;
 
   const [postReview, { error, isSuccess }] = usePostReviewMutation();
 
@@ -58,11 +59,20 @@ const NewReviews = ({ roomId }: { roomId: string }) => {
 
   return (
     <>
-      {canReview && (
+      {/* {canReview && (
         <Button onPress={onOpen} color="danger">
           Submit Your Review
         </Button>
-      )}
+      )} */}
+      {canReview ? (
+        <Button onPress={onOpen} color="danger">
+          Submit Your Review
+        </Button>
+      ) : !hasReviewed ? (
+        <p className="text-sm text-gray-500 italic">
+          You must have a confirmed booking to leave a review.
+        </p>
+      ) : null}
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} className="mb-36">
         <ModalContent>

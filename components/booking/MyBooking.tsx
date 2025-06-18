@@ -19,8 +19,9 @@ import {
 import { useCancelBookingMutation } from "@/redux/api/bookingApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { IBooking } from "@/backend/models/booking";
+// import { IBooking } from "@/backend/models/booking";
 import axios from "axios";
+import { IBooking } from "@/types/booking";
 
 interface Props {
   data: IBooking[];
@@ -28,7 +29,9 @@ interface Props {
 
 const MyBookings = ({ data }: Props) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
+    null
+  );
   const [bookingList, setBookingList] = useState<IBooking[]>([]); // Initialize as an empty array
   const router = useRouter();
   const [cancelBooking, { error, isSuccess }] = useCancelBookingMutation();
@@ -50,21 +53,24 @@ const MyBookings = ({ data }: Props) => {
   // ✅ Handle cancel booking updates
   useEffect(() => {
     if (error && "data" in error) {
-      const errorMessage = (error as any)?.data?.errMessage || "An error occurred";
+      const errorMessage =
+        (error as any)?.data?.errMessage || "An error occurred";
       toast.error(errorMessage);
     }
 
     if (isSuccess && selectedBookingId) {
       toast.success("Booking canceled successfully");
       //@ts-ignore
-      setBookingList((prevBookings) =>
-        prevBookings
-          ? prevBookings.map((booking) =>
-              booking._id === selectedBookingId
-                ? { ...booking, status: "cancelled" }
-                : booking
-            )
-          : [] // Return an empty array if prevBookings is null
+      setBookingList(
+        (prevBookings) =>
+          prevBookings
+            ? prevBookings.map((booking) =>
+                // booking._id === selectedBookingId
+                booking.id === selectedBookingId
+                  ? { ...booking, status: "cancelled" }
+                  : booking
+              )
+            : [] // Return an empty array if prevBookings is null
       );
 
       onOpenChange();
@@ -81,7 +87,7 @@ const MyBookings = ({ data }: Props) => {
     const data: { columns: any[]; rows: any[] } = {
       columns: [
         { label: "ID", field: "id" },
-        { label: "Room", field: "room"},
+        { label: "Room", field: "room" },
         { label: "Check In", field: "checkin" },
         { label: "Check Out", field: "checkout" },
         { label: "Amount Paid", field: "amountpaid" },
@@ -94,22 +100,29 @@ const MyBookings = ({ data }: Props) => {
       const isCancelled = booking.status === "cancelled";
       const isPending = booking.status === "pending";
       data.rows.push({
-        id: booking._id,
+        // id: booking._id,
+        // room: booking.room?.name,
+        // checkin: new Date(booking?.checkInDate).toLocaleString("en-US"),
+        // checkout: new Date(booking?.checkOutDate).toLocaleString("en-US"),
+        // amountpaid: `₱${booking?.amountPaid}`,
+        id: booking.id,
         room: booking.room?.name,
-        checkin: new Date(booking?.checkInDate).toLocaleString("en-US"),
-        checkout: new Date(booking?.checkOutDate).toLocaleString("en-US"),
-        amountpaid: `₱${booking?.amountPaid}`,
+        checkin: new Date(booking?.check_in_date).toLocaleString("en-US"),
+        checkout: new Date(booking?.check_out_date).toLocaleString("en-US"),
+        amountpaid: `₱${booking?.amount_paid}`,
         actions: (
           <div className="flex gap-4">
             <Link
-              href={`/bookings/${booking._id}`}
+              // href={`/bookings/${booking._id}`}
+              href={`/bookings/${booking.id}`}
               color="secondary"
               isDisabled={isPending || isCancelled}
             >
               <i className="fa fa-eye"></i>
             </Link>
             <Link
-              href={`/bookings/invoice/${booking._id as string}`}
+              // href={`/bookings/invoice/${booking._id as string}`}
+              href={`/bookings/invoice/${booking.id as string}`}
               color="success"
               isDisabled={isPending || isCancelled}
             >
@@ -127,21 +140,34 @@ const MyBookings = ({ data }: Props) => {
             ) : (
               <>
                 <Button onPress={onOpen}>Cancel</Button>
-                <Modal backdrop="opaque" isOpen={isOpen} onOpenChange={onOpenChange}>
+                <Modal
+                  backdrop="opaque"
+                  isOpen={isOpen}
+                  onOpenChange={onOpenChange}
+                >
                   <ModalContent>
                     {(onClose) => (
                       <>
                         <ModalBody>
-                          <h1 className="mt-5">Are you sure you want to cancel?</h1>
+                          <h1 className="mt-5">
+                            Are you sure you want to cancel?
+                          </h1>
                         </ModalBody>
                         <ModalFooter>
-                          <Button color="danger" variant="light" onPress={onClose}>
+                          <Button
+                            color="danger"
+                            variant="light"
+                            onPress={onClose}
+                          >
                             No
                           </Button>
                           <Button
                             color="secondary"
                             onPress={onClose}
-                            onClick={() => cancelBookingHandler(booking._id as string)}
+                            onClick={() =>
+                              // cancelBookingHandler(booking._id as string)
+                              cancelBookingHandler(booking.id as string)
+                            }
                           >
                             Yes
                           </Button>

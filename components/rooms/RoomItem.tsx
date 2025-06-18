@@ -26,23 +26,27 @@ const RoomItem: React.FC<Props> = ({ room }) => {
         <div className="pt-4 ml-2">
           <div className="flex justify-between font-semibold flex-col gap-2 mt-5">
             <p className="text-xl">{room?.name}</p>
-            <p className="text-md font-medium mb-2">₱ {room?.pricePerNight} / per night</p>
+            {/* <p className="text-md font-medium mb-2">₱ {room?.pricePerNight} / per night</p> */}
+            <p className="text-md font-medium mb-2">
+              ₱ {Number(room?.price_per_night || 0).toLocaleString()} / per night
+            </p>
           </div>
         </div>
         <div className="ml-2 flex">
           <StarRatings
-            rating={room?.ratings}
+            rating={Number(room?.ratings) || 0}
             starRatedColor="#000000"
             numberOfStars={5}
             starDimension="18px"
             starSpacing="1px"
             name="rating"
           />
-          <span>({room?.numOfReviews}) Reviews</span>
+          <span>({room?.num_of_reviews}) Reviews</span>
         </div>
         <div className="flex flex-row items-center ">
           <Button
-            href={`/rooms/${room?._id}`}
+            // href={`/rooms/${room?._id}`}
+            href={`/rooms/${room?.id}`}
             as={Link}
             variant="solid"
             className="w-56 mt-2 ml-2"

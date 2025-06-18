@@ -1,4 +1,4 @@
-import dbConnect from "@/backend/config/dbConnect";
+import dbConnect, { connectToPostgres } from "@/backend/config/dbConnect";
 import { deleteRoom, updateRoom } from "@/backend/controllers/roomControllers";
 import {
   authorizeRoles,
@@ -15,7 +15,7 @@ interface RequestContext {
 
 const router = createEdgeRouter<NextRequest, RequestContext>();
 
-dbConnect();
+connectToPostgres();
 
 router.use(isAuthenticatedUser, authorizeRoles("admin")).put(updateRoom);
 router.use(isAuthenticatedUser, authorizeRoles("admin")).delete(deleteRoom);

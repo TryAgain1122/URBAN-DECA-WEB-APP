@@ -1,6 +1,5 @@
 "use client";
 
-import { IImage, IRoom } from "@/backend/models/room";
 import { revalidateTag } from "@/helpers/revalidate";
 import {
   useDeleteRoomImageMutation,
@@ -22,7 +21,7 @@ import {
   Skeleton,
   Spinner,
 } from "@heroui/react";
-import { RiRouterLine } from "react-icons/ri";
+import { IImage, IRoom } from "@/types/room";
 
 interface Props {
   data: {
@@ -116,7 +115,7 @@ const   UploadRoomImages = ({ data }: Props) => {
       toast.error("No Image uploaded");
       return;
     }
-    uploadRoomImages({ id: data?.room?._id, body: { images } });
+    uploadRoomImages({ id: data?.room?.id, body: { images } });
   };
 
   const removeImagePreview = (imgUrl: string) => {
@@ -127,7 +126,7 @@ const   UploadRoomImages = ({ data }: Props) => {
   };
 
   const handleImageDelete = (imgId: string) => {
-    deleteRoomImage({ id: data?.room?._id, body: { imgId } });
+    deleteRoomImage({ id: data?.room?.id, body: { imgId } });
   };
 
   const handleResetFileInput = () => {

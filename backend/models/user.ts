@@ -1,86 +1,86 @@
-// //POSTGRESQL Database
-// import pool from "@/backend/config/dbConnect";
-// import bcrypt from "bcryptjs";
-// import crypto from "crypto";
+//POSTGRESQL Database
+import pool from "@/backend/config/dbConnect";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
-// export interface User {
-//   id: number;
-//   name: string;
-//   email: string;
-//   password: string;
-//   avatar_public_id?: string | null;
-//   avatar_url?: string | null;
-//   role: string;
-//   google_id?: string | null;
-//   created_at: Date;
-//   reset_password_token?: string | null;
-//   reset_password_expire?: Date | null;
-// }
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  avatar_public_id?: string | null;
+  avatar_url?: string | null;
+  role: string;
+  google_id?: string | null;
+  created_at: Date;
+  reset_password_token?: string | null;
+  reset_password_expire?: Date | null;
+}
 
-// export async function createUser(user: {
-//   name: string;
-//   email: string;
-//   password: string;
-//   avatar?: { public_id?: string; url?: string };
-//   role?: string;
-//   googleId?: string;
-// }) {
-//   const hashedPassword = await bcrypt.hash(user.password, 10);
-//   const { name, email, avatar, role, googleId } = user;
+export async function createUser(user: {
+  name: string;
+  email: string;
+  password: string;
+  avatar?: { public_id?: string; url?: string };
+  role?: string;
+  googleId?: string;
+}) {
+  const hashedPassword = await bcrypt.hash(user.password, 10);
+  const { name, email, avatar, role, googleId } = user;
 
-//   const result = await pool.query(
-//      `INSERT INTO users 
-//       (name, email, password, avatar_public_id, avatar_url, role, google_id) 
-//      VALUES ($1, $2, $3, $4, $5, $6, $7)
-//      RETURNING *`,
-//      [
-//       name,
-//       email,
-//       hashedPassword,
-//       avatar?.public_id || null,
-//       avatar?.url || null,
-//       role || "user",
-//       googleId || null
-//      ]
-//   );
+  const result = await pool.query(
+     `INSERT INTO users 
+      (name, email, password, avatar_public_id, avatar_url, role, google_id) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING *`,
+     [
+      name,
+      email,
+      hashedPassword,
+      avatar?.public_id || null,
+      avatar?.url || null,
+      role || "user",
+      googleId || null
+     ]
+  );
 
-//   return result.rows[0] as User
-// }
-//  export async function comparePassword(
-//   plainPassword: string,
-//   hashedPassword: string 
-//  ): Promise<boolean> {
-//   return await bcrypt.compare(plainPassword, hashedPassword);
-//  }
+  return result.rows[0] as User
+}
+ export async function comparePassword(
+  plainPassword: string,
+  hashedPassword: string 
+ ): Promise<boolean> {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+ }
 
-//  export function generateResetToken() {
-//   const resetToken = crypto.randomBytes(20).toString("hex");
-//   const hashedToken = crypto
-//   .createHash("sha256")
-//   .update(resetToken)
-//   .digest("hex");
+ export function generateResetToken() {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+  const hashedToken = crypto
+  .createHash("sha256")
+  .update(resetToken)
+  .digest("hex");
 
-//   const expires = new Date(Date.now() + 30 * 60 * 1000);
+  const expires = new Date(Date.now() + 30 * 60 * 1000);
 
-//   return {
-//     resetToken,
-//     hashedToken,
-//     expires
-//   }
-//  }
+  return {
+    resetToken,
+    hashedToken,
+    expires
+  }
+ }
 
-//  export async function setResetToken(userId: number) {
-//   const { resetToken, hashedToken, expires} = generateResetToken();
+ export async function setResetToken(userId: number) {
+  const { resetToken, hashedToken, expires} = generateResetToken();
 
-//   await pool.query(
-//     `UPDATE users
-//       SET reset_password_token = $1, reset_password_expire = $2
-//       WHERE id = $3`,
-//       [hashedToken, expires, userId]
-//   );
+  await pool.query(
+    `UPDATE users
+      SET reset_password_token = $1, reset_password_expire = $2
+      WHERE id = $3`,
+      [hashedToken, expires, userId]
+  );
 
-//   return resetToken;
-//  }
+  return resetToken;
+ }
 
 //MONGODB Database
 

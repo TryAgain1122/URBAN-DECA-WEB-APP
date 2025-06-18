@@ -1,6 +1,7 @@
 import { withAuth } from "next-auth/middleware";
-import { IUser } from "./backend/models/user";
+// import { IUser } from "./backend/models/user";
 import { NextResponse } from "next/server";
+import { IUser } from "./types/user";
 
 export default withAuth(
   function middleware(req) {

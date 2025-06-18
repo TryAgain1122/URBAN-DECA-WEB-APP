@@ -1,83 +1,67 @@
-import pool from '@/backend/config/dbConnect';
-
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import GoogleProvider from "next-auth/providers/google";
+import bcrypt from "bcryptjs";
+import pool from "@/backend/config/dbConnect";
 
-export const authOptions = (req: any, res: any) => {
-  return NextAuth(req, res, {
-    session: {
-      strategy: "jwt",
-    },
-    providers: [
-      CredentialsProvider({
-        name: "Credentials",
-        credentials: {
-          email: { label: "Email", type: "text" },
-          password: { label: "Password", type: "password" },
-        },
-        // @ts-ignore
-        async authorize(credentials: any) {
-          const { email, password } = credentials;
-
-          const result = await pool.query(
-            "SELECT * FROM users WHERE email = $1",
-            [email]
-          );
-
-          const user = result.rows[0];
-
-          if (!user) throw new Error("Invalid email or password");
-
-          const isMatch = await bcrypt.compare(password, user.password);
-
-          if (!isMatch) throw new Error("Invalid email or password");
-
-          // remove password before returning to session
-          delete user.password;
-          return user;
-        },
-      }),
-      GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      }),
-    ],
-    callbacks: {
-      jwt: async ({ token, user }) => {
-        if (user) {
-          token.user = user as any;
-        }
-
-        // If session is being updated
-        if (req.url?.includes("/api/auth/session?update")) {
-          const updated = await pool.query(
-            "SELECT * FROM users WHERE id = $1",
-            [token.user.id]
-          );
-          token.user = updated.rows[0];
-        }
-
-        return token;
+const handler = NextAuth({
+  session: {
+    strategy: "jwt",
+  },
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
-      session: async ({ session, token }) => {
-        
-        session.user = token.user;
-        //@ts-ignore
-        delete session.user?.password;
-        return session;
+      async authorize(credentials: any) {
+        const { email, password } = credentials;
+
+        const result = await pool.query(
+          "SELECT * FROM users WHERE email = $1",
+          [email]
+        );
+
+        const user = result.rows[0];
+
+        if (!user) throw new Error("Invalid email or password");
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) throw new Error("Invalid email or password");
+
+        delete user.password; // Remove sensitive data
+        return user;
       },
-    },
-    pages: {
-      signIn: "/",
-    },
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-};
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user as any;
+      }
 
-export { authOptions as GET, authOptions as POST };
+      // Optional session refresh logic
+      return token;
+    },
+    async session({ session, token }) {
+      session.user = token.user;
+      // @ts-ignore
+      delete session.user?.password;
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+});
 
+export { handler as GET, handler as POST };
 
 // import dbConnect from "@/backend/config/dbConnect";
 // import User, { IUser } from "@/backend/models/user";

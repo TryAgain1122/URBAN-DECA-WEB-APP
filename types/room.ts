@@ -89,7 +89,7 @@ export interface IRoom {
   address: string;
   location: Location;
   guest_capacity: number;
-  num_of_Beds: number;
+  num_of_beds: number;
   is_internet: boolean;
   is_breakfast: boolean;
   is_air_conditioned: boolean;

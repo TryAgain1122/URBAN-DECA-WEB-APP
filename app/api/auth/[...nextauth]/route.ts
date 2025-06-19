@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import GoogleProvider from "next-auth/providers/google";
 import { NextRequest, NextResponse } from 'next/server';
 
-const authOptions = (req: any, res: any) => {
+export const authOptions = (req: any, res: any) => {
   return NextAuth(req, res, {
     session: {
       strategy: "jwt",

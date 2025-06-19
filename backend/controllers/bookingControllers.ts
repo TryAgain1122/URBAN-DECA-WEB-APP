@@ -1309,24 +1309,25 @@ export const getUserNotifications = catchAsyncErrors(
 );
 
 
-export const markNotificationAsRead = catchAsyncErrors(
-  async (req: NextRequest, { params }: { params: { id: string } }) => {
-    const notificationId = params.id;
+export const markAllNotificationsAsRead = catchAsyncErrors(
+  async (req: NextRequest) => {
+    console.log("🔔 [START] Marking ALL notifications as read...");
 
-    const checkQuery = `SELECT * FROM notifications WHERE id = $1`;
-    const { rows } = await pool.query(checkQuery, [notificationId]);
+    try {
+      const updateQuery = `UPDATE notifications SET is_read = true WHERE is_read = false RETURNING *`;
+      const result = await pool.query(updateQuery);
 
-    if (rows.length === 0) {
-      throw new ErrorHandler("Notification not found", 404);
+      console.log("✅ Notifications updated:", result.rowCount);
+      console.log("📦 Updated rows preview:", result.rows.slice(0, 3)); // preview 1-3 rows only
+
+      return NextResponse.json({
+        success: true,
+        message: "All notifications marked as read",
+        updated: result.rowCount,
+      });
+    } catch (error) {
+      console.error("❌ Error while updating notifications:", error);
+      throw error;
     }
-
-    const updateQuery = `UPDATE notifications SET is_read = true WHERE id = $1 RETURNING`;
-    const result = await pool.query(updateQuery, [notificationId]);
-
-    return NextResponse.json({
-      success: true,
-      message: "Notification marked as read",
-      notification: result.rows[0],
-    });
   }
 );

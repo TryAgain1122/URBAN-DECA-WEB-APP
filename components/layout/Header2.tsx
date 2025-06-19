@@ -10,7 +10,6 @@
 // import { useGetAdminNotificationsQuery } from "@/redux/api/bookingApi";
 // import { FaBell } from "react-icons/fa";
 
-
 // const Header2 = () => {
 //   const [isOpen, setIsOpen] = useState(false);
 //   const [isClicked, setIsClicked] = useState(false);
@@ -119,8 +118,8 @@
 //                   //   : user?.avatar
 //                   //   ? user?.avatar?.url
 //                   //   : "/images/default_avatar.jpg"
-//                   data?.user?.image || 
-//                   user?.avatar_url || 
+//                   data?.user?.image ||
+//                   user?.avatar_url ||
 //                   "/images/default_avatar.jpg"
 //                 }
 //               />
@@ -180,7 +179,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import { Avatar, Skeleton, Link } from "@heroui/react";
+import { Avatar, Skeleton, Link, Spinner } from "@heroui/react";
 import Image from "next/image";
 import { FaBell } from "react-icons/fa";
 
@@ -190,12 +189,15 @@ import { setIsAuthenticated, setUser } from "@/redux/features/userSlice";
 import {
   useGetAdminNotificationsQuery,
   useGetUserNotificationsQuery,
+  useMarkNotificationsAsReadMutation,
+  
 } from "@/redux/api/bookingApi";
 
 const Header2 = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(true);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -203,6 +205,8 @@ const Header2 = () => {
   const { data: sessionData, status } = useSession();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+
+  const [markNotificationsAsRead] = useMarkNotificationsAsReadMutation();
 
   const isAdmin = user?.role === "admin";
   const isUser = user?.role === "user";
@@ -223,6 +227,7 @@ const Header2 = () => {
     skip: !isUser,
   });
 
+  // ✅ Show ALL notifications (not just unread)
   const notifications =
     isAdmin
       ? adminData?.notifications ?? []
@@ -232,6 +237,9 @@ const Header2 = () => {
         )
       : [];
 
+  // ✅ Count unread separately for badge display
+  const unreadCount = notifications.filter((notif: any) => !notif.is_read).length;
+
   useEffect(() => {
     if (sessionData) {
       dispatch(setUser(sessionData.user));
@@ -239,20 +247,24 @@ const Header2 = () => {
     }
   }, [sessionData, dispatch]);
 
-  useEffect(() => {
-  console.log("✅ userData:", userData);
-  console.log("✅ Filtered user notifications:", notifications);
-
-}, [userData, notifications]);
-
   const toggleDropdown = () => {
     setIsOpen((prev) => !prev);
     setIsClicked(true);
     setTimeout(() => setIsClicked(false), 150);
   };
 
-  const toggleNotifDropdown = () => {
-    setNotifOpen((prev) => !prev);
+  const toggleNotifDropdown = async () => {
+    const newState = !notifOpen;
+    setNotifOpen(newState);
+
+    if (newState && hasUnread) {
+      try {
+        await markNotificationsAsRead({}).unwrap();
+        setHasUnread(false);
+      } catch (err) {
+        console.error("❌ Failed to mark notifications as read:", err);
+      }
+    }
   };
 
   const handleClickedOutside = (event: MouseEvent) => {
@@ -312,9 +324,9 @@ const Header2 = () => {
           <div className="relative" ref={notifRef}>
             <button onClick={toggleNotifDropdown} className="relative">
               <FaBell className="text-xl text-gray-600" />
-              {notifications.length > 0 && (
+              {unreadCount > 0 && hasUnread && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 rounded-full animate-pulse">
-                  {notifications.length}
+                  {unreadCount}
                 </span>
               )}
             </button>
@@ -325,15 +337,19 @@ const Header2 = () => {
                   {isAdmin ? "Pending Bookings" : "Booking Updates"}
                 </h4>
                 {(loadingAdminNotif || loadingUserNotif) ? (
-                  <p className="text-sm px-2 text-gray-500">Loading notifications...</p>
+                  <div className="flex justify-center p-3">
+                    <Spinner color="danger" />
+                  </div>
                 ) : notifications.length === 0 ? (
-                  <p className="text-sm px-2 text-gray-500">No new notifications</p>
+                  <p className="text-sm px-2 text-gray-500">No notifications</p>
                 ) : (
                   <ul className="space-y-2 max-h-60 overflow-y-auto">
                     {notifications.map((notif: any) => (
                       <li
                         key={notif.id}
-                        className="text-sm text-gray-700 bg-gray-50 rounded px-3 py-2 hover:bg-gray-100"
+                        className={`text-sm px-3 py-2 rounded hover:bg-gray-100 ${
+                          notif.is_read ? "text-gray-400 bg-gray-50" : "text-gray-700 bg-white"
+                        }`}
                       >
                         {isAdmin ? (
                           <p>
@@ -437,3 +453,4 @@ const Header2 = () => {
 };
 
 export default Header2;
+

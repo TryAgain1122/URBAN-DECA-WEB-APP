@@ -77,15 +77,21 @@ export const bookingApi = createApi({
 
     getAdminNotifications: builder.query({
       query: () => ({
-        url: "/admin/notifications"
-      })
+        url: "/admin/notifications",
+      }),
     }),
 
     getUserNotifications: builder.query({
       query: () => ({
-        url: "/bookings/notifications"
-      })
-    })
+        url: "/bookings/notifications",
+      }),
+    }),
+ markNotificationsAsRead: builder.mutation({
+  query: () => ({
+    url: "/bookings/notifications/mark_as_read",
+    method: "PUT",
+  }),
+}),
   }),
 });
 
@@ -100,4 +106,5 @@ export const {
   useUpdateBookingStatusMutation,
   useGetAdminNotificationsQuery,
   useGetUserNotificationsQuery,
+  useMarkNotificationsAsReadMutation,
 } = bookingApi;

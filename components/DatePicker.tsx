@@ -312,7 +312,7 @@ const DatePicker: React.FC<Props> = ({ room }) => {
               )
             }
           />
-
+{/* 
           {isAvailable === true && (
             <p className="mt-3 px-3 text-green-800">
               Room is Available. Book Now
@@ -325,6 +325,24 @@ const DatePicker: React.FC<Props> = ({ room }) => {
 
           {isAvailable && !isAuthenticated && (
             <p className="mt-3 px-3 text-center">Login to book room</p>
+          )} */}
+
+          {isAvailable === false && (
+            <p className="mt-3 px-3 text-center text-red-600 font-medium">
+              Room not available.
+            </p>
+          )}
+
+          {isAvailable === true && !isAuthenticated && (
+            <p className="mt-3 px-3 text-center text-yellow-600 font-medium">
+              Login to book room.
+            </p>
+          )}
+
+          {isAvailable === true && isAuthenticated && (
+            <p className="mt-3 px-3 text-green-800 font-medium">
+              Room is Available. Book Now.
+            </p>
           )}
 
           {isAvailable && isAuthenticated && (

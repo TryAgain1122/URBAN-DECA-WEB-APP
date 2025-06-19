@@ -76,7 +76,11 @@ export const authOptions = (req: any, res: any) => {
   });
 };
 
-export { authOptions as GET, authOptions as POST };
+const handler = (req: any, res: any) => {
+  return authOptions(req, res)
+}
+
+export { handler as GET, handler as POST };
 
 
 
@@ -230,4 +234,3 @@ export { authOptions as GET, authOptions as POST };
 // }
 
 // export { auth as GET, auth as POST };
-

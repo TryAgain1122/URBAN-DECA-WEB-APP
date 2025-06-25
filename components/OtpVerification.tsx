@@ -194,7 +194,7 @@ const OtpVerification = ({ email }: Props) => {
         <Divider />
         <CardBody className="gap-4">
           <p className="text-sm text-center">
-            We've sent a 6-digit code to <strong>{email}</strong>
+           {"We've sent a 6-digit code to"} <strong>{email}</strong>
           </p>
 
           <div className="flex gap-4 justify-center mt-4">

@@ -99,6 +99,7 @@ const MyBookings = ({ data }: Props) => {
     bookingList.forEach((booking) => {
       const isCancelled = booking.status === "cancelled";
       const isPending = booking.status === "pending";
+      const isRejected = booking.status === "rejected";
       data.rows.push({
         // id: booking._id,
         // room: booking.room?.name,
@@ -116,7 +117,7 @@ const MyBookings = ({ data }: Props) => {
               // href={`/bookings/${booking._id}`}
               href={`/bookings/${booking.id}`}
               color="secondary"
-              isDisabled={isPending || isCancelled}
+              isDisabled={isPending || isCancelled || isRejected}
             >
               <i className="fa fa-eye"></i>
             </Link>
@@ -124,7 +125,7 @@ const MyBookings = ({ data }: Props) => {
               // href={`/bookings/invoice/${booking._id as string}`}
               href={`/bookings/invoice/${booking.id as string}`}
               color="success"
-              isDisabled={isPending || isCancelled}
+              isDisabled={isPending || isCancelled || isRejected}
             >
               <i className="fa fa-receipt"></i>
             </Link>
@@ -136,6 +137,10 @@ const MyBookings = ({ data }: Props) => {
             ) : isCancelled ? (
               <Button variant="faded" isDisabled>
                 Cancelled
+              </Button>
+            ) : isRejected ? (
+              <Button variant="faded" isDisabled>
+                Rejected
               </Button>
             ) : (
               <>

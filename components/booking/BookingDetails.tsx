@@ -131,12 +131,15 @@ const BookingDetails = ({ data }: Props) => {
             </div>
 
             <div className="flex-grow ml-5">
-              <Link
+              {/* <Link
                 href={`/room/${booking?.room?.id}`}
                 className="text-blue-500 hover:underline"
               >
                 {booking?.room?.name}
-              </Link>
+              </Link> */}
+               <p className="text-blue-500 hover:underline">
+                {booking?.room?.name}
+              </p>
             </div>
 
             <div className="w-24 mt-4 lg:mt-0">

@@ -1,12 +1,12 @@
-import pool from '@/backend/config/dbConnect';
+import pool from "@/backend/config/dbConnect";
 
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import GoogleProvider from "next-auth/providers/google";
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
- const authOptions = (req: any, res: any) => {
+const authOptions = (req: any, res: any) => {
   return NextAuth(req, res, {
     session: {
       strategy: "jwt",
@@ -34,6 +34,34 @@ import { NextRequest, NextResponse } from 'next/server';
           const isMatch = await bcrypt.compare(password, user.password);
 
           if (!isMatch) throw new Error("Invalid email or password");
+
+          //Addition Start
+          if (!user.is_verified) {
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+            const otpExpire = new Date(Date.now() + 10 * 60 * 1000); //10 Minutes
+
+            await pool.query(
+              `UPDATE users SET otp_code = $1, otp_expire = $2 WHERE email = $3`,
+              [otp, otpExpire, email]
+            );
+
+            const message = `
+              <p>Hello ${user.name}, </p>
+              <p>Your new verification code is:</p>
+              <h2>${otp}</h2>
+              <p>This code will expire in 10 minutes</p>
+            `;
+
+            const sendEmail = (await import("../../../../backend/utils/sendEmail")).default;
+
+            await sendEmail({
+              email,
+              subject: "Urban Deca Tower - OTP Verification",
+              message,
+            });
+
+            throw new Error("NOT_VERIFIED");
+          }
 
           // remove password before returning to session
           delete user.password;
@@ -63,7 +91,6 @@ import { NextRequest, NextResponse } from 'next/server';
         return token;
       },
       session: async ({ session, token }) => {
-        
         session.user = token.user;
         //@ts-ignore
         delete session.user?.password;
@@ -78,12 +105,11 @@ import { NextRequest, NextResponse } from 'next/server';
 };
 
 const handler = (req: NextRequest, res: NextResponse) => {
-  return authOptions(req, res)
-}
+  return authOptions(req, res);
+};
 
 export { handler as GET, handler as POST };
 
-
 // import NextAuth from "next-auth";
 // import CredentialsProvider from "next-auth/providers/credentials";
 // import GoogleProvider from "next-auth/providers/google";
@@ -150,7 +176,6 @@ export { handler as GET, handler as POST };
 
 // export { handler as GET, handler as POST };
 
-
 // import NextAuth from "next-auth";
 // import CredentialsProvider from "next-auth/providers/credentials";
 // import GoogleProvider from "next-auth/providers/google";
@@ -216,7 +241,6 @@ export { handler as GET, handler as POST };
 // });
 
 // export { handler as GET, handler as POST };
-
 
 // import dbConnect from "@/backend/config/dbConnect";
 // import User, { IUser } from "@/backend/models/user";

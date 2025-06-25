@@ -34,7 +34,6 @@
 
 //   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
-
 //   const [checkBookingAvailability, { data }] =
 //     useLazyCheckBookingAvailabilityQuery();
 
@@ -189,7 +188,7 @@ import {
 import toast from "react-hot-toast";
 import PaypalButton from "./PaypalButton";
 import { IRoom } from "@/types/room";
-
+import { useSendInvoiceMutation } from "@/redux/api/bookingApi";
 interface Props {
   room: IRoom;
 }
@@ -200,6 +199,7 @@ const DatePicker: React.FC<Props> = ({ room }) => {
   const [days_of_stay, setDaysOfStay] = useState(0);
   const [isPaypalVisible, setIsPaypalVisible] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const [sendInvoice] = useSendInvoiceMutation();
 
   const router = useRouter();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
@@ -209,17 +209,16 @@ const DatePicker: React.FC<Props> = ({ room }) => {
   const [newBooking] = useNewBookingMutation();
 
   useEffect(() => {
-  if (isError && (error as any)?.data?.errMessage) {
-    const errorMessage =
-      (error as any).data.errMessage || "An error occurred";
-    toast.error(errorMessage);
-    console.error("API Error:", error);
-  } else if (isError) {
-    toast.error("An unexpected error occurred while checking availability.");
-    console.error("API Error (no message):", error);
-  }
-}, [isError, error]);
-
+    if (isError && (error as any)?.data?.errMessage) {
+      const errorMessage =
+        (error as any).data.errMessage || "An error occurred";
+      toast.error(errorMessage);
+      console.error("API Error:", error);
+    } else if (isError) {
+      toast.error("An unexpected error occurred while checking availability.");
+      console.error("API Error (no message):", error);
+    }
+  }, [isError, error]);
 
   const isAvailable = data?.isAvailable;
 
@@ -246,35 +245,82 @@ const DatePicker: React.FC<Props> = ({ room }) => {
     }
   };
 
-  const handlePaymentSuccess = async (details: any) => {
-    if (!check_in_date || !check_out_date) return;
+  // const handlePaymentSuccess = async (details: any) => {
+  //   if (!check_in_date || !check_out_date) return;
 
-    const bookingData = {
-      // room: room._id,
-      room_id: room.id,
-      check_in_date: check_in_date.toISOString(),
-      check_out_date: check_out_date.toISOString(),
-      days_of_stay,
-      amount_paid: totalAmount,
-      payment_info: {
-        id: details.id,
-        status: details.status === "COMPLETED" ? "paid" : details.status,
-      },   
-    };
+  //   const bookingData = {
+  //     // room: room._id,
+  //     room_id: room.id,
+  //     check_in_date: check_in_date.toISOString(),
+  //     check_out_date: check_out_date.toISOString(),
+  //     days_of_stay,
+  //     amount_paid: totalAmount,
+  //     payment_info: {
+  //       id: details.id,
+  //       status: details.status === "COMPLETED" ? "paid" : details.status,
+  //     },
+  //   };
 
-    console.log("Booking data to send: ", bookingData)
-    try {
-      await newBooking(bookingData).unwrap();
-      toast.success(`Payment successful! Transaction ID: ${details.id}`);
-      router.push("/confirmation");
-    } catch (error) {
-      console.log("Booking failed", error);
-      toast.error("Booking failed");
-    }
-  };
+  //   console.log("Booking data to send: ", bookingData);
+  //   try {
+  //     const res = await newBooking(bookingData).unwrap();
+  //     const bookingId = res?.booking?.id;
+
+  //     // await newBooking(bookingData).unwrap();
+  //     toast.success(`Payment successful! Transaction ID: ${details.id}`);
+
+  //     if (bookingId) {
+  //       await sendInvoice(bookingId);
+  //     }
+  //     router.push("/confirmation");
+  //   } catch (error) {
+  //     console.log("Booking failed", error);
+  //     toast.error("Booking failed");
+  //   }
+  // };
 
   // const totalAmount = room.pricePerNight * daysOfStay;
-   const totalAmount = room.price_per_night * days_of_stay;
+  
+  const handlePaymentSuccess = async (details: any) => {
+  if (!check_in_date || !check_out_date) return;
+
+  const bookingData = {
+    room_id: room.id,
+    check_in_date: check_in_date.toISOString(),
+    check_out_date: check_out_date.toISOString(),
+    days_of_stay,
+    amount_paid: totalAmount,
+    payment_info: {
+      id: details.id,
+      status: details.status === "COMPLETED" ? "paid" : details.status,
+    },
+  };
+
+  try {
+    const res = await newBooking(bookingData).unwrap();
+    const bookingId = res?.booking?.id;
+
+    toast.success(`Payment successful! Transaction ID: ${details.id}`);
+
+    // 📨 Try sending invoice
+    if (bookingId) {
+      try {
+        await sendInvoice(bookingId).unwrap();
+        toast.success("Invoice sent to your email");
+      } catch (invoiceErr: any) {
+        console.error("❌ Invoice sending failed:", invoiceErr);
+        toast.error(invoiceErr?.data?.error || "Failed to send invoice email");
+      }
+    }
+
+    router.push("/confirmation");
+  } catch (error) {
+    console.error("❌ Booking failed:", error);
+    toast.error("Booking failed. Please try again.");
+  }
+};
+
+  const totalAmount = room.price_per_night * days_of_stay;
 
   return (
     <div>
@@ -282,8 +328,8 @@ const DatePicker: React.FC<Props> = ({ room }) => {
         <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
           <p className="text-tiny uppercase font-bold">Select Date</p>
           <h4 className="font-bold text-large mb-2">
-            {/* ₱ {room?.pricePerNight} <span></span>/ night */}
-             ₱ {room?.price_per_night} <span></span>/ night
+            {/* ₱ {room?.pricePerNight} <span></span>/ night */}₱{" "}
+            {room?.price_per_night} <span></span>/ night
           </h4>
           <Divider />
         </CardHeader>
@@ -312,7 +358,7 @@ const DatePicker: React.FC<Props> = ({ room }) => {
               )
             }
           />
-{/* 
+          {/* 
           {isAvailable === true && (
             <p className="mt-3 px-3 text-green-800">
               Room is Available. Book Now
@@ -368,18 +414,27 @@ const DatePicker: React.FC<Props> = ({ room }) => {
                 </div>
               )}
 
-              <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+              <Modal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                placement="center"
+              >
                 <ModalContent>
                   {(onClose) => (
                     <>
                       <ModalHeader>Notice</ModalHeader>
                       <ModalBody>
                         <p>
-                          Once you book, you cannot refund your payment. Are you sure you want to proceed?
+                          Once you book, you cannot refund your payment. Are you
+                          sure you want to proceed?
                         </p>
                       </ModalBody>
                       <ModalFooter>
-                        <Button color="danger" variant="light" onPress={onClose}>
+                        <Button
+                          color="danger"
+                          variant="light"
+                          onPress={onClose}
+                        >
                           Cancel
                         </Button>
                         <Button
@@ -405,4 +460,3 @@ const DatePicker: React.FC<Props> = ({ room }) => {
 };
 
 export default DatePicker;
-

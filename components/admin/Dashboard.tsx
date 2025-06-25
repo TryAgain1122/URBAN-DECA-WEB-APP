@@ -16,6 +16,7 @@ import {
   Spinner,
   Button,
 } from "@heroui/react";
+import BookingTable from "../charts/BookingTable";
 
 const Dashboard = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -115,6 +116,7 @@ const Dashboard = () => {
       <div className="w-full mt-5">
         <SalesStats data={data} />
       </div>
+      <BookingTable bookings={data?.bookings}/>
 
       <Card className="py-4 mt-5">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

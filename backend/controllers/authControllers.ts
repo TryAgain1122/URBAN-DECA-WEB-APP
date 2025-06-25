@@ -1,9 +1,9 @@
-//POSTGRESQL CONTROLLER 
+//POSTGRESQL CONTROLLER
 
 import { NextRequest, NextResponse } from "next/server";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
-import bcrypt from 'bcryptjs';
-import pool from '@/backend/config/dbConnect';
+import bcrypt from "bcryptjs";
+import pool from "@/backend/config/dbConnect";
 import ErrorHandler from "../utils/errorHandler";
 import { delete_file, upload_file } from "../utils/cloudinary";
 import crypto from "crypto";
@@ -13,33 +13,135 @@ import sendEmail from "../utils/sendEmail";
 // Register user  =>  /api/auth/register
 export const registerUser = catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
-  const { name, email, password } = body
+  const { name, email, password } = body;
+
+  //Check if user already exists
+  const checkUser = await pool.query(`SELECT * FROM users WHERE email = $1`, [
+    email,
+  ]);
+  if (checkUser.rows.length > 0)
+    throw new ErrorHandler("User already exists", 400);
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-   await pool.query(
-    `INSERT INTO users (name, email, password) VALUES ($1, $2, $3)`,
-    [name, email, hashedPassword]
+  //Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpire = new Date(Date.now() + 10 * 60 * 1000);
+
+  await pool.query(
+    `INSERT INTO users (name, email, password, otp_code, otp_expire, is_verified) VALUES ($1, $2, $3, $4, $5, $6)`,
+    [name, email, hashedPassword, otp, otpExpire, false]
   );
 
-  return NextResponse.json({ success: true})
-})
+  const message = `
+    <p>Hello ${name},</p>
+    <p>Your verification code is:</p>
+    <h2>${otp}</h2>
+    <p>This code will expire in 10 minutes.</p>
+  `;
+
+  try {
+    await sendEmail({
+      email,
+      subject: "Urban Deca Tower",
+      message,
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "OTP sent to your email",
+    });
+  } catch (error: any) {
+    await pool.query(`DELETE FROM users WHERE email = $1`, [email]);
+    throw new ErrorHandler("Failed to send OTP. Try again later.", 500);
+  }
+});
+
+//Verify OTP => /api/auth/verify_otp
+export const verifyOtp = catchAsyncErrors(async (req: NextRequest) => {
+  const body = await req.json();
+  const { email, otp } = body;
+
+  const { rows } = await pool.query(`SELECT * FROM users WHERE email = $1`, [
+    email,
+  ]);
+  const user = rows[0];
+
+  if (!user) throw new ErrorHandler("User not found", 404);
+  if (!user.otp_code || user.otp_expire < new Date()) {
+    throw new ErrorHandler("OTP expired or not found", 400);
+  }
+
+  if (user.otp_code !== otp) {
+    throw new ErrorHandler("Invalid OTP", 400);
+  }
+
+  await pool.query(
+    `UPDATE users SET is_verified = true, otp_code = NULL, otp_expire = NULL WHERE email = $1`,
+    [email]
+  );
+  return NextResponse.json({ success: true, message: "OTP is verified" });
+});
 
 // Update use profile  =>  /api/me/update
 export const updateProfile = catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
   const { name, email } = body;
 
-  await pool.query(
-    `UPDATE users SET name = $1, email = $2 WHERE id = $3`,
-    [name, email, req.user.id]
-  );
+  await pool.query(`UPDATE users SET name = $1, email = $2 WHERE id = $3`, [
+    name,
+    email,
+    req.user.id,
+  ]);
 
   return NextResponse.json({ success: true });
 });
 
+// Resend OTP => /api/auth/resend_otp
+export const resendOtp = catchAsyncErrors(async (req: NextRequest) => {
+  const body = await req.json();
+  const { email } = body;
+
+  const { rows } = await pool.query(`SELECT * FROM users WHERE email = $1`, [
+    email,
+  ]);
+  const user = rows[0];
+
+  if (!user) throw new ErrorHandler("User not found with this email", 404);
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpire = new Date(Date.now() + 10 * 60 * 1000);
+
+  await pool.query(
+    `UPDATE users SET otp_code = $1, otp_expire = $2 WHERE email = $3`,
+    [otp, otpExpire, email]
+  );
+
+  const message = `
+    <p>Hello ${user.name},</p>
+    <p>Your new OTP code is:</p>
+    <h2>${otp}</h2>
+    <p>This code will expire in 10 minutes.</p>
+  `;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Your New OTP Code",
+      message,
+    });
+  } catch(error: any) {
+    await pool.query(
+      `UPDATE users SET otp_code = NULL, otp_expire = NULL WHERE email = $1`,
+      [email]
+    );
+    throw new ErrorHandler(error.message, 500);
+  }
+   return NextResponse.json({ success: true, message: "OTP sent to your email" });
+});
+
 // Update password  =>  /api/me/update_password
-export const updatePassword = catchAsyncErrors(async (req: NextRequest) => {
+export default catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
 
   const { rows } = await pool.query(
@@ -54,10 +156,10 @@ export const updatePassword = catchAsyncErrors(async (req: NextRequest) => {
 
   const hashedPassword = await bcrypt.hash(body.password, 10);
 
-  await pool.query(
-    `UPDATE users SET password = $1 WHERE id = $2`,
-    [hashedPassword, req.user.id]
-  );
+  await pool.query(`UPDATE users SET password = $1 WHERE id = $2`, [
+    hashedPassword,
+    req.user.id,
+  ]);
 
   return NextResponse.json({ success: true });
 });
@@ -82,13 +184,18 @@ export const forgotPassword = catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
   const { email } = body;
 
-  const { rows } = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+  const { rows } = await pool.query(`SELECT * FROM users WHERE email = $1`, [
+    email,
+  ]);
   const user = rows[0];
 
   if (!user) throw new ErrorHandler("User not found with this email", 404);
 
   const resetToken = crypto.randomBytes(20).toString("hex");
-  const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
   const expire = new Date(Date.now() + 30 * 60 * 1000);
 
   await pool.query(
@@ -117,79 +224,92 @@ export const forgotPassword = catchAsyncErrors(async (req: NextRequest) => {
 });
 
 // Reset password  =>  /api/password/reset/:token
-export const resetPassword = catchAsyncErrors(async (req: NextRequest, { params }: { params: { token: string } }) => {
-  const body = await req.json();
+export const resetPassword = catchAsyncErrors(
+  async (req: NextRequest, { params }: { params: { token: string } }) => {
+    const body = await req.json();
 
-  const resetPasswordToken = crypto
-    .createHash("sha256")
-    .update(params.token)
-    .digest("hex");
+    const resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(params.token)
+      .digest("hex");
 
-  const { rows } = await pool.query(
-    `SELECT * FROM users WHERE reset_password_token = $1 AND reset_password_expire > NOW()`,
-    [resetPasswordToken]
-  );
+    const { rows } = await pool.query(
+      `SELECT * FROM users WHERE reset_password_token = $1 AND reset_password_expire > NOW()`,
+      [resetPasswordToken]
+    );
 
-  const user = rows[0];
-  if (!user) throw new ErrorHandler("Token is invalid or expired", 404);
-  if (body.password !== body.confirmPassword) throw new ErrorHandler("Passwords do not match", 400);
+    const user = rows[0];
+    if (!user) throw new ErrorHandler("Token is invalid or expired", 404);
+    if (body.password !== body.confirmPassword)
+      throw new ErrorHandler("Passwords do not match", 400);
 
-  const hashedPassword = await bcrypt.hash(body.password, 10);
+    const hashedPassword = await bcrypt.hash(body.password, 10);
 
-  await pool.query(
-    `UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expire = NULL WHERE id = $2`,
-    [hashedPassword, user.id]
-  );
+    await pool.query(
+      `UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expire = NULL WHERE id = $2`,
+      [hashedPassword, user.id]
+    );
 
-  return NextResponse.json({ success: true });
-});
+    return NextResponse.json({ success: true });
+  }
+);
 
-// Get all users => /api/admin/users 
+// Get all users => /api/admin/users
 export const allAdminUsers = catchAsyncErrors(async (req: NextRequest) => {
   const { rows } = await pool.query(`SELECT * FROM users`);
   return NextResponse.json({ users: rows });
 });
 
 // Get user details => /api/admin/users/:id
-export const getUserDetails = catchAsyncErrors(async (req: NextRequest, { params }: { params: { id: string } }) => {
-  const { rows } = await pool.query(`SELECT * FROM users WHERE id = $1`, [params.id]);
-  const user = rows[0];
+export const getUserDetails = catchAsyncErrors(
+  async (req: NextRequest, { params }: { params: { id: string } }) => {
+    const { rows } = await pool.query(`SELECT * FROM users WHERE id = $1`, [
+      params.id,
+    ]);
+    const user = rows[0];
 
-  if (!user) throw new ErrorHandler("User not found with ID", 404);
-  return NextResponse.json({ user });
-});
+    if (!user) throw new ErrorHandler("User not found with ID", 404);
+    return NextResponse.json({ user });
+  }
+);
 
 // Update user details => /api/admin/users/:id
-export const updateUser = catchAsyncErrors(async (req: NextRequest, { params }: { params: { id: string } }) => {
-  const body = await req.json();
+export const updateUser = catchAsyncErrors(
+  async (req: NextRequest, { params }: { params: { id: string } }) => {
+    const body = await req.json();
 
-  await pool.query(
-    `UPDATE users SET name = $1, email = $2, role = $3 WHERE id = $4`,
-    [body.name, body.email, body.role, params.id]
-  );
+    await pool.query(
+      `UPDATE users SET name = $1, email = $2, role = $3 WHERE id = $4`,
+      [body.name, body.email, body.role, params.id]
+    );
 
-  return NextResponse.json({ success: true });
-});
+    return NextResponse.json({ success: true });
+  }
+);
 
 //Delete user => /api/admin/users/:id
-export const deleteUser = catchAsyncErrors(async (req: NextRequest, { params }: { params: { id: string } }) => {
-  // Optional: get avatar before delete
-  const { rows } = await pool.query(`SELECT avatar_public_id FROM users WHERE id = $1`, [params.id]);
-  const user = rows[0];
+export const deleteUser = catchAsyncErrors(
+  async (req: NextRequest, { params }: { params: { id: string } }) => {
+    // Optional: get avatar before delete
+    const { rows } = await pool.query(
+      `SELECT avatar_public_id FROM users WHERE id = $1`,
+      [params.id]
+    );
+    const user = rows[0];
 
-  if (!user) throw new ErrorHandler("User not found with this ID", 404);
-  if (user.avatar_public_id) await delete_file(user.avatar_public_id);
+    if (!user) throw new ErrorHandler("User not found with this ID", 404);
+    if (user.avatar_public_id) await delete_file(user.avatar_public_id);
 
-  await pool.query(`DELETE FROM users WHERE id = $1`, [params.id]);
+    await pool.query(`DELETE FROM users WHERE id = $1`, [params.id]);
 
-  return NextResponse.json({ success: true });
-});
+    return NextResponse.json({ success: true });
+  }
+);
 
 export const createBooking = catchAsyncErrors(async (req: NextRequest) => {
   const body = await req.json();
-  const {
-    userId, roomId, checkInDate, checkOutDate, amountPaid, daysOfStay
-  } = body;
+  const { userId, roomId, checkInDate, checkOutDate, amountPaid, daysOfStay } =
+    body;
 
   // Optional: validate required fields
   if (!userId || !roomId || !checkInDate || !checkOutDate || !amountPaid) {
@@ -210,12 +330,11 @@ export const createBooking = catchAsyncErrors(async (req: NextRequest) => {
     [userId]
   );
 
-  return NextResponse.json({ success: true, message: "Booking submitted and admin notified." });
+  return NextResponse.json({
+    success: true,
+    message: "Booking submitted and admin notified.",
+  });
 });
-
-
-
-
 // import { NextRequest, NextResponse } from "next/server";
 // import { catchAsyncErrors } from "../middlewares/catchAsyncErrors";
 // import User from "../models/user";
@@ -386,7 +505,7 @@ export const createBooking = catchAsyncErrors(async (req: NextRequest) => {
 //   }
 // );
 
-// // Get all users => /api/admin/users 
+// // Get all users => /api/admin/users
 // export const allAdminUsers = catchAsyncErrors(async (req: NextRequest) => {
 //   const users = await User.find();
 
@@ -445,7 +564,7 @@ export const createBooking = catchAsyncErrors(async (req: NextRequest) => {
 //       success: true
 //     })
 //   }
-// ) 
+// )
 
 // const pool = db.pool;
 
@@ -522,7 +641,7 @@ export const createBooking = catchAsyncErrors(async (req: NextRequest) => {
 
 // export const uploadAvatar = catchAsyncErrors(async (req: NextRequest) => {
 //   const body = await req.json();
-  
+
 //   const avatarResponse = await upload_file(body?.avatar, "bookit/avatars");
 
 //   // Remove avatar from cloudinary if exists
@@ -555,7 +674,7 @@ export const createBooking = catchAsyncErrors(async (req: NextRequest) => {
 //   }
 
 //   const user = result.rows[0];
-  
+
 //   // Get reset token and update the user record
 //   const resetToken = user.getResetPasswordToken();
 //   await pool.query(

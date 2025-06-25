@@ -13,6 +13,13 @@ export const authApi = createApi({
         };
       },
     }),
+    verifyOtp: builder.mutation({
+      query: (body) => ({
+        url: "/auth/verify_otp",
+        method: "POST",
+        body
+      })
+    }),
     forgotPassword: builder.mutation({
       query(body) {
         return {
@@ -31,6 +38,13 @@ export const authApi = createApi({
         };
       },
     }),
+    resendOtp: builder.mutation({
+      query: (body) => ({
+        url: "/auth/resend_otp",
+        method: "POST",
+        body
+      })
+    })
   }),
 });
 
@@ -38,4 +52,6 @@ export const {
   useRegisterMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
+  useVerifyOtpMutation,
+  useResendOtpMutation
 } = authApi;

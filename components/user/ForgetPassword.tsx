@@ -7,7 +7,6 @@ import {
   CardBody,
   CardFooter,
   Divider,
-  Link,
   Image,
   Input,
   Button,
@@ -68,8 +67,8 @@ const ForgetPassword = () => {
           </CardBody>
           <Divider />
           <CardFooter>
-            <Button variant="faded" color="secondary" type="submit" isDisabled={isLoading}>
-             {isLoading ? <Spinner color="secondary"/> : "Send Email"}
+            <Button color="danger" type="submit" isDisabled={isLoading}>
+             {isLoading ? <Spinner color="default"/> : "Send Email"}
             </Button>
           </CardFooter>
         </Card>

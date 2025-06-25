@@ -18,7 +18,8 @@ export interface IBooking {
   payment_info: PaymentInfo;
   paid_at: Date;
   created_at: Date;
-  status: "pending" | "confirmed" | "cancelled";
+  status: "pending" | "confirmed" | "cancelled" | "rejected";
   cancellation_confirmed: boolean;
+  payment_status: string;
   user: IUser
 }

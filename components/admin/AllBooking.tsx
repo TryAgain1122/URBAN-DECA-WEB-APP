@@ -21,10 +21,10 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import {
   useDeleteBookingMutation,
+  useRejectBookingMutation,
   useUpdateBookingStatusMutation,
 } from "@/redux/api/bookingApi";
 import { IBooking } from "@/types/booking";
-// import { IBooking } from "@/backend/models/booking";
 
 interface Props {
   data: {
@@ -37,16 +37,18 @@ const AllBookings = ({ data }: Props) => {
     null
   );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const bookings = data?.bookings;
   const router = useRouter();
 
+  // ✅ Show all bookings (including rejected)
+  const bookings = data?.bookings;
+
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Number of items per page
+  const itemsPerPage = 10;
 
   const [deleteBooking, { error, isLoading, isSuccess }] =
     useDeleteBookingMutation();
-
   const [updateBookingStatus] = useUpdateBookingStatusMutation();
+  const [rejectBooking] = useRejectBookingMutation();
 
   useEffect(() => {
     if (error && "data" in error) {
@@ -61,7 +63,22 @@ const AllBookings = ({ data }: Props) => {
     }
   }, [error, isSuccess, router]);
 
-  console.log("Bookings data", bookings);
+  const getStatusBadge = (status: string) => {
+    const colorClass =
+      status === "confirmed"
+        ? "bg-green-500"
+        : status === "rejected"
+        ? "bg-red-500"
+        : "bg-yellow-500";
+
+    return (
+      <span
+        className={`px-2 py-1 rounded text-white text-xs font-semibold uppercase ${colorClass}`}
+      >
+        {status}
+      </span>
+    );
+  };
 
   const setBookings = () => {
     const data: { columns: any[]; rows: any[] } = {
@@ -79,11 +96,6 @@ const AllBookings = ({ data }: Props) => {
 
     bookings?.forEach((booking) => {
       data?.rows.push({
-        // id: booking._id,
-        // room: booking.room?.name,
-        // checkin: new Date(booking?.checkInDate).toLocaleString("en-US"),
-        // checkout: new Date(booking?.checkOutDate).toLocaleString("en-US"),
-        // amountpaid: `₱${booking?.amountPaid}`,
         id: booking.id,
         room: booking.room?.name,
         checkin: new Date(booking?.check_in_date).toLocaleString("en-US"),
@@ -92,7 +104,6 @@ const AllBookings = ({ data }: Props) => {
         actions: (
           <div className="flex gap-4">
             <Button
-              // href={`/bookings/${booking._id}`}
               href={`/bookings/${booking.id}`}
               color="secondary"
               as={Link}
@@ -101,19 +112,23 @@ const AllBookings = ({ data }: Props) => {
               <i className="fa fa-eye"></i>
             </Button>
             <Button
-              // href={`/bookings/invoice/${booking._id as string}`}
-              href={`/bookings/invoice/${booking.id as string}`}
+              href={`/bookings/invoice/${booking.id}`}
               color="success"
               as={Link}
               isIconOnly
+              isDisabled={booking.status === "rejected"}
+              title={
+                booking.status === "rejected"
+                  ? "Receipt disabled"
+                  : "View Receipt"
+              }
             >
               <i className="fa fa-receipt text-white"></i>
             </Button>
             <Button
               isIconOnly
               onPress={() => {
-                // setBookingIdToDelete(booking._id);
-                 setBookingIdToDelete(booking.id);
+                setBookingIdToDelete(booking.id);
                 onOpen();
               }}
               color="danger"
@@ -123,26 +138,27 @@ const AllBookings = ({ data }: Props) => {
             <Button
               isIconOnly
               color="success"
-              // onPress={() => handleConfirmBooking(booking._id)}
               onPress={() => handleConfirmBooking(booking.id)}
               title="Confirm"
+              isDisabled={booking.status !== "pending"}
             >
               <i className="fa fa-check"></i>
             </Button>
             <Button
               isIconOnly
               color="warning"
-              // onPress={() => handleRejectingBooking(booking._id)}
               onPress={() => handleRejectingBooking(booking.id)}
               title="Reject"
+              isDisabled={booking.status !== "pending"}
             >
               <i className="fa fa-times"></i>
             </Button>
           </div>
         ),
-        status: booking.status,
+        status: getStatusBadge(booking.status),
       });
     });
+
     return data;
   };
 
@@ -155,7 +171,6 @@ const AllBookings = ({ data }: Props) => {
   const bookingData = setBookings();
   const totalPages = Math.ceil(bookingData.rows.length / itemsPerPage);
 
-  // Slice the rows for the current page
   const currentRows = bookingData.rows.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -168,9 +183,13 @@ const AllBookings = ({ data }: Props) => {
   };
 
   const handleRejectingBooking = async (id: string) => {
-    await updateBookingStatus({ id, status: "rejected" });
-    router.refresh();
-    toast.success("Booking rejected");
+    try {
+      await rejectBooking({ id }).unwrap();
+      toast.success("Booking rejected");
+      router.refresh();
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to reject booking");
+    }
   };
 
   return (

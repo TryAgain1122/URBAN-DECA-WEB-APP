@@ -65,6 +65,7 @@ export const bookingApi = createApi({
         };
       },
     }),
+
     updateBookingStatus: builder.mutation({
       query({ id, status }) {
         return {
@@ -73,6 +74,16 @@ export const bookingApi = createApi({
           body: { status },
         };
       },
+    }),
+
+    rejectBooking: builder.mutation({
+      query({ id, reject }) {
+        return {
+          url: `/admin/bookings/${id}/reject`,
+          method: "PUT",
+          body: { reject }
+        }
+      }
     }),
 
     getAdminNotifications: builder.query({
@@ -86,12 +97,19 @@ export const bookingApi = createApi({
         url: "/bookings/notifications",
       }),
     }),
- markNotificationsAsRead: builder.mutation({
-  query: () => ({
-    url: "/bookings/notifications/mark_as_read",
-    method: "PUT",
-  }),
-}),
+    markNotificationsAsRead: builder.mutation({
+      query: () => ({
+        url: "/bookings/notifications/mark_as_read",
+        method: "PUT",
+      }),
+    }),
+    sendInvoice: builder.mutation({
+      query: (bookingId: string) => ({
+        url: "/bookings/invoice/send",
+        method: "POST",
+        body: { bookingId }
+      })
+    })
   }),
 });
 
@@ -107,4 +125,6 @@ export const {
   useGetAdminNotificationsQuery,
   useGetUserNotificationsQuery,
   useMarkNotificationsAsReadMutation,
+  useRejectBookingMutation,
+  useSendInvoiceMutation,
 } = bookingApi;

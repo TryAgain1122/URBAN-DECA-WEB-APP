@@ -383,6 +383,8 @@ import Moment from "moment";
 import { extendMoment } from "moment-range";
 import ErrorHandler from "../utils/errorHandler";
 import pool from "../config/dbConnect";
+import { invoiceTemplate } from "../utils/invoiceTemplate";
+import sendEmail from "../utils/sendEmail";
 
 const moment = extendMoment(Moment);
 
@@ -509,7 +511,7 @@ export const checkRoomBookingAvailability = catchAsyncErrors(
 export const getAdminNotifications = catchAsyncErrors(
   async (req: NextRequest) => {
     try {
-      console.log("➡️ Fetching admin notifications...");
+      // console.log("➡️ Fetching admin notifications...");
 
       const { rows } = await pool.query(
         `
@@ -535,8 +537,8 @@ export const getAdminNotifications = catchAsyncErrors(
         `
       );
 
-      console.log("✅ Notifications fetched:", rows.length, "rows");
-      console.log(rows);
+      // console.log("✅ Notifications fetched:", rows.length, "rows");
+      // console.log(rows);
 
       return NextResponse.json({
         success: true,
@@ -729,7 +731,7 @@ export const getBookingDetails = catchAsyncErrors(
           id: row.room_id,
           name: row.room_name,
           price_per_night: row.price_per_night,
-          images: row.images
+          images: row.images,
         },
       };
 
@@ -858,13 +860,35 @@ export const getSalesStats = async (req: NextRequest) => {
 
     console.log("📆 Getting sales stats between:", startDate, endDate);
 
-    const { rows } = await pool.query(
-      `SELECT amount_paid FROM bookings WHERE created_at BETWEEN $1 AND $2`,
+    const bookingsResult = await pool.query(
+      ` SELECT 
+          bookings.*, 
+          rooms.name AS room_name,
+          rooms.category AS room_category,
+          users.name AS user_name
+      FROM bookings
+      LEFT JOIN rooms ON bookings.room_id = rooms.id
+      LEFT JOIN users ON bookings.user_id = users.id
+      WHERE bookings.created_at BETWEEN $1 AND $2
+      ORDER BY bookings.created_at DESC`,
       [startDate, endDate]
     );
 
-    const numberOfBookings = rows.length;
-    const totalSales = rows.reduce(
+    const bookings = bookingsResult.rows.map((row: any) => ({
+      ...row,
+      room: {
+        id: row.room_id,
+        name: row.room_name,
+        category: row.room_category,
+      },
+      user: {
+        id: row.user_id,
+        name: row.user_name,
+      },
+    }));
+
+    const numberOfBookings = bookings.length;
+    const totalSales = bookings.reduce(
       (acc: any, b: any) => acc + parseFloat(b.amount_paid),
       0
     );
@@ -877,6 +901,7 @@ export const getSalesStats = async (req: NextRequest) => {
       totalSales,
       sixMonthSalesData,
       topRooms,
+      bookings, // ✅ Added this!
     });
   } catch (error) {
     console.error("❌ Error in getSalesStats handler:", error);
@@ -886,6 +911,7 @@ export const getSalesStats = async (req: NextRequest) => {
     );
   }
 };
+
 // export const getSalesStats = catchAsyncErrors(async (req: NextRequest) => {
 //   const { searchParams } = new URL(req.url);
 
@@ -1082,7 +1108,7 @@ export const allAdminBookings = catchAsyncErrors(async (req: NextRequest) => {
     `;
 
   const { rows } = await pool.query(query);
-  console.log("All Rooms Fetched: ", rows);
+  // console.log("All Rooms Fetched: ", rows);
 
   const bookings = rows.map((row: any) => ({
     id: row.id,
@@ -1096,7 +1122,7 @@ export const allAdminBookings = catchAsyncErrors(async (req: NextRequest) => {
   }));
 
   return NextResponse.json({
-    bookings
+    bookings,
   });
 });
 
@@ -1233,6 +1259,126 @@ export const confirmBooking = catchAsyncErrors(
   }
 );
 
+// api/admin/bookings/:id/reject/route.ts
+export const rejectBooking = catchAsyncErrors(
+  async (req: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const bookingId = params.id;
+      const userRole = req.user.role;
+
+      console.log("🔒 User Role:", userRole);
+      console.log("📌 Booking ID to reject:", bookingId);
+
+      if (userRole !== "admin") {
+        throw new ErrorHandler("Only admins can reject bookings", 403);
+      }
+
+      const result = await pool.query(`SELECT * FROM bookings WHERE id = $1`, [
+        bookingId,
+      ]);
+      const booking = result.rows[0];
+
+      if (!booking) {
+        throw new ErrorHandler("Booking not found", 404);
+      }
+
+      if (booking.status !== "pending") {
+        throw new ErrorHandler("Only pending bookings can be rejected", 400);
+      }
+
+      await pool.query(
+        `UPDATE bookings SET status = 'rejected' WHERE id = $1`,
+        [bookingId]
+      );
+
+      // Get room name
+      const roomRes = await pool.query(`SELECT name FROM rooms WHERE id = $1`, [
+        booking.room_id,
+      ]);
+      const roomName = roomRes.rows[0]?.name || "your room";
+
+      // Insert notification
+      await pool.query(
+        `
+        INSERT INTO notifications (
+          id, user_id, room_id, type, message, status, is_read, created_at
+        ) VALUES (
+          gen_random_uuid(), $1, $2, 'booking-update', $3, 'rejected', FALSE, NOW()
+        )`,
+        [
+          booking.user_id,
+          booking.room_id,
+          `Your booking for "${roomName}" has been rejected by the admin.`,
+        ]
+      );
+
+      console.log("❌ Booking rejected & notification sent");
+
+      return NextResponse.json({
+        success: true,
+        message: "Booking has been rejected",
+      });
+    } catch (error: any) {
+      console.error("❌ Error in rejectBooking:", error.message);
+      return NextResponse.json({
+        success: false,
+        message: error.message,
+        status: 500,
+      });
+    }
+  }
+);
+
+//Send Invoice => /api/bookings/invoice/send/route.ts
+export const sendInvoice = catchAsyncErrors(async (req: NextRequest) => {
+  try {
+    const { bookingId } = await req.json();
+    console.log("📦 Booking ID received:", bookingId);
+
+    const result = await pool.query(
+      `
+      SELECT b.*, 
+            to_json(u) as user, 
+            to_json(r) as room 
+      FROM bookings b 
+      JOIN users u ON b.user_id = u.id 
+      JOIN rooms r ON b.room_id = r.id 
+      WHERE b.id = $1
+    `,
+      [bookingId]
+    );
+
+    const booking = result.rows[0];
+    console.log("📄 Booking found:", booking);
+
+    if (!booking) {
+      console.log("❌ Booking not found");
+      return NextResponse.json({
+        error: "Booking not found",
+        status: 404,
+      });
+    }
+
+    const html = invoiceTemplate(booking);
+    console.log("📧 HTML invoice ready");
+
+    await sendEmail({
+      email: booking.user.email,
+      subject: "Your Urban Deca Tower Booking Invoice",
+      message: html,
+    });
+
+    console.log("✅ Invoice email sent");
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("❌ Error in sendInvoice controller:", error);
+    return NextResponse.json(
+      { error: "Internal server error", details: error.message },
+      { status: 500 }
+    );
+  }
+});
+
 // //Create a new Booking and notify admin => /api/bookings
 // export const creteBooking = catchAsyncErrors(async (req: NextRequest) => {
 //   const body = await req.json();
@@ -1307,7 +1453,6 @@ export const getUserNotifications = catchAsyncErrors(
     });
   }
 );
-
 
 export const markAllNotificationsAsRead = catchAsyncErrors(
   async (req: NextRequest) => {

@@ -10,6 +10,7 @@ import {
   Input,
   Button,
   Link,
+  Spinner,
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useRegisterMutation } from "@/redux/api/authApi";
@@ -34,11 +35,11 @@ const Register = () => {
       toast.error(errorMessage);
     }
     if (isSuccess) {
-      router.push("/");
-      toast.success("Account Registered. You can login now");
+      toast.success("Account Registered. Please verify your OTP");
+      router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
     }
 
-  },[error, isSuccess, router])
+  },[error, isSuccess, email, router])
 
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -96,12 +97,12 @@ const Register = () => {
           <Divider />
           <CardFooter className="w-full flex justify-end gap-3 px-5">
             <Link href="/">
-            <Button color="danger" variant="flat">
+            <Button color="default" variant="flat">
               Close
             </Button>
             </Link>     
-            <Button color="secondary" type="submit">
-              {isLoading ? <ButtonLoader /> : "Register"}
+            <Button color="danger" type="submit">
+              {isLoading ? <Spinner color="default"/> : "Register"}
             </Button>       
           </CardFooter>
         </Card>

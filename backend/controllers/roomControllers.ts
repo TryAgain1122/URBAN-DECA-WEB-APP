@@ -16,32 +16,92 @@ const safeJsonParse = (jsonStr: string | null) => {
 };
 
 // Get all rooms => /api/rooms
+// export const allRooms = catchAsyncErrors(async (req: NextRequest) => {
+//   const resPerPage = 4;
+//   const { searchParams } = new URL(req.url);
+
+//   // Basic offset & limit pagination
+//   const page = Number(searchParams.get("page")) || 1;
+//   const offset = (page - 1) * resPerPage;
+
+//   // Example: Fetch total count
+//   const totalRes = await pool.query("SELECT COUNT(*) FROM rooms");
+//   const filteredRoomsCount = Number(totalRes.rows[0].count);
+
+//   // Fetch rooms with limit and offset
+//   const roomsRes = await pool.query(
+//     "SELECT * FROM rooms ORDER BY created_at ASC LIMIT $1 OFFSET $2",
+//     [resPerPage, offset]
+//   );
+//   const rooms = roomsRes.rows;
+
+//   return NextResponse.json({
+//     success: true,
+//     filteredRoomsCount,
+//     resPerPage,
+//     rooms,
+//   });
+// });
+
 export const allRooms = catchAsyncErrors(async (req: NextRequest) => {
   const resPerPage = 4;
   const { searchParams } = new URL(req.url);
 
-  // Basic offset & limit pagination
-  const page = Number(searchParams.get("page")) || 1;
+  const page = parseInt(searchParams.get("page") || "1");
+  const name = searchParams.get("name") || "";
+  const category = searchParams.get("category");
+  const guestCapacity = searchParams.get("guest_capacity");
+
+  const filters: string[] = [];
+  const values: any[] = [];
+
+  // 🔍 Search by name (room name only)
+  if (name) {
+    filters.push(`name ILIKE $${values.length + 1}`);
+    values.push(`%${name}%`);
+  }
+
+  // 🛏 Filter by category
+  if (category) {
+    filters.push(`category = $${values.length + 1}`);
+    values.push(category);
+  }
+
+  // 👤 Filter by guest capacity
+  if (guestCapacity) {
+    filters.push(`guest_capacity >= $${values.length + 1}`);
+    values.push(Number(guestCapacity));
+  }
+
+  const whereClause = filters.length > 0 ? `WHERE ${filters.join(" AND ")}` : "";
+
+  // Get count
+  const countQuery = `SELECT COUNT(*) FROM rooms ${whereClause}`;
+  const countResult = await pool.query(countQuery, values);
+  const filteredRoomsCount = parseInt(countResult.rows[0].count);
+
+  // Pagination
   const offset = (page - 1) * resPerPage;
+  const roomsQuery = `
+    SELECT * FROM rooms
+    ${whereClause}
+    ORDER BY created_at DESC
+    LIMIT $${values.length + 1}
+    OFFSET $${values.length + 2}
+  `;
+  values.push(resPerPage, offset);
 
-  // Example: Fetch total count
-  const totalRes = await pool.query("SELECT COUNT(*) FROM rooms");
-  const filteredRoomsCount = Number(totalRes.rows[0].count);
-
-  // Fetch rooms with limit and offset
-  const roomsRes = await pool.query(
-    "SELECT * FROM rooms ORDER BY created_at ASC LIMIT $1 OFFSET $2",
-    [resPerPage, offset]
-  );
-  const rooms = roomsRes.rows;
+  const roomsResult = await pool.query(roomsQuery, values);
 
   return NextResponse.json({
     success: true,
     filteredRoomsCount,
     resPerPage,
-    rooms,
+    rooms: roomsResult.rows,
   });
 });
+
+
 
 // Create new room => /api/admin/rooms
 // Create new room => /api/admin/rooms

@@ -33,7 +33,7 @@ const Search = () => {
 
     const queryString = [
       formData.name && `name=${encodeURIComponent(formData.name)}`,
-      formData.guests && `guestCapacity=${encodeURIComponent(formData.guests)}`,
+      formData.guests && `guest_capacity=${encodeURIComponent(formData.guests)}`,
       formData.category && `category=${encodeURIComponent(formData.category)}`,
     ]
       .filter(Boolean)

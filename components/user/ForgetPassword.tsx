@@ -63,6 +63,7 @@ const ForgetPassword = () => {
                 onChange={(e) => setEmail(e.target.value)} 
                 name="email"
                 value={email}
+                variant="bordered"
             />
           </CardBody>
           <Divider />

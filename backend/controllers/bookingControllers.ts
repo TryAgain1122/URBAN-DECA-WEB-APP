@@ -452,7 +452,8 @@ export const newBooking = catchAsyncErrors(async (req: NextRequest) => {
         type,
         message,
         is_read,
-        created_at
+        created_at,
+        receiver_role
       )
       VALUES (
         gen_random_uuid(),
@@ -461,7 +462,8 @@ export const newBooking = catchAsyncErrors(async (req: NextRequest) => {
         'booking',
         $3,
         FALSE,
-        NOW()
+        NOW(),
+        'admin'
       );
     `,
     [
@@ -533,6 +535,8 @@ export const getAdminNotifications = catchAsyncErrors(
           ORDER BY bookings.created_at DESC
           LIMIT 1
         ) b ON true
+        WHERE n.receiver_role = 'admin'
+        AND b.status = 'pending'
         ORDER BY n.created_at DESC
         `
       );
@@ -1439,7 +1443,9 @@ export const getUserNotifications = catchAsyncErrors(
       FROM notifications n
       LEFT JOIN rooms r ON n.room_id = r.id
       LEFT JOIN bookings b ON n.user_id = b.user_id AND n.room_id = b.room_id
-      WHERE n.user_id = $1 AND b.status = 'confirmed'
+      WHERE n.user_id = $1 
+        AND b.status IN ('confirmed', 'rejected', 'cancelled') -- ✅ multiple statuses
+        AND n.receiver_role = 'user' -- ✅ only show user notifications
       ORDER BY n.created_at DESC
     `;
 
@@ -1453,6 +1459,7 @@ export const getUserNotifications = catchAsyncErrors(
     });
   }
 );
+
 
 export const markAllNotificationsAsRead = catchAsyncErrors(
   async (req: NextRequest) => {

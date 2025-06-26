@@ -15,7 +15,7 @@ export const invoiceTemplate = (booking: IBooking) => {
 
   return `
     <div style="display: flex, justify-content: center font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; border: 1px solid #ddd;">
-      <h2 style="text-align: center; color: #e53935;">Urban Deca Tower Booking Invoice</h2>
+      <h2 style="text-align: center; margin: auto color: #e53935;">Urban Deca Tower Booking Invoice</h2>
 
       <p><strong>Date:</strong> ${new Date(paid_at).toLocaleDateString()}</p>
       <p><strong>To:</strong> ${user.name} (${user.email})</p>
